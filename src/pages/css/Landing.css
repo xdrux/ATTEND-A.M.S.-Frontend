@@ -1,0 +1,53 @@
+.LandingLogo {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 70vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#landing-logo {
+    width: 70vw;
+    /* Add any specific styles for your logo here */
+}
+
+.LandingButtonsBlock {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    width: 30vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    row-gap: 5vh;
+}
+
+.LandingButton {
+    width: 20vw;
+    height: 12vh;
+    background-color: rgb(123, 17, 19);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    cursor: pointer;
+    border-radius: 20px;
+}
+
+.LandingButton:hover {
+    transform: scale(1.05);
+    /* Adjust the scale factor as needed */
+    transition: transform 0.3s ease;
+    /* Add a smooth transition effect */
+}
+
+.landingButtonText {
+    color: white;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 4vh;
+}

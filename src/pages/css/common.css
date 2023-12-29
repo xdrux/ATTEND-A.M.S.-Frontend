@@ -1,0 +1,75 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.Bg {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    height: 100vh;
+    /* Add other necessary styles for your content */
+}
+
+.Bg::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-image: url('../../assets/green_diagonal.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+    z-index: -1;
+}
+
+p {
+    margin: 0;
+}
+
+.Header {
+    height: 20vh;
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    column-gap: 1vw;
+}
+
+.BackIcon {
+    height: 15vh;
+    margin-left: 2vw;
+    cursor: pointer;
+}
+
+.HeaderText {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 11vh;
+    color: rgb(123, 17, 19);
+    font-weight: bold;
+    user-select: none;
+}
+
+.AppLogo {
+    position: absolute;
+    bottom: 1vh;
+    right: 1vw;
+    height: 8vh;
+}
+
+.fade-in {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.1s ease-in-out;
+    /* Adjust the duration and easing function as needed */
+}
+
+.fade-in.active {
+    opacity: 1;
+    visibility: visible;
+}
