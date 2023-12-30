@@ -1,0 +1,71 @@
+.formBlock {
+    position: absolute;
+    width: 100vw;
+    height: 71vh;
+    top: 20vh;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.formItem {
+    display: flex;
+    align-items: center;
+}
+
+.checkboxBlock {
+    display: flex;
+}
+
+.checkbox-container {
+    display: flex;
+    /* Use flexbox to arrange checkboxes horizontally */
+}
+
+.checkbox-container label {
+    margin-right: 10px;
+    /* Add some space between checkboxes */
+}
+
+.date-picker-button {
+    width: 20vw;
+    height: 6vh;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.classStartDate {
+    margin-left: 10vw;
+}
+
+.ClassDateBlock {
+    display: flex;
+    align-items: center;
+}
+
+.ClassStartTime {
+    width: 20vw;
+    height: 6vh;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#classTime {
+    height: 6vh;
+    width: 20vw;
+}
