@@ -8,6 +8,7 @@ body {
     padding: 0;
     position: relative;
     height: 100vh;
+    width: 100vw;
     /* Add other necessary styles for your content */
 }
 
@@ -72,4 +73,82 @@ p {
 .fade-in.active {
     opacity: 1;
     visibility: visible;
+}
+
+.addButton {
+    height: 8vh;
+    width: 13vw;
+    background-color: rgb(123, 17, 19);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 3vh;
+    position: absolute;
+    right: 2vw;
+    border-radius: 20px;
+}
+
+#addFormErrors {
+    position: absolute;
+    top: 15vh;
+    right: 2.5vw;
+    color: rgb(123, 17, 19);
+    font-size: 2.1vh;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+#classList {
+    position: absolute;
+    top: 20vh;
+    left: 0;
+    height: 70vh;
+    width: 100vw;
+    overflow: auto;
+}
+
+#classList::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+#classList {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+
+.classesBlock {
+    display: flex;
+    /* font-size: 10vh; */
+    width: 100vw;
+    justify-content: space-around;
+}
+
+.classMainBlock {
+    position: absolute;
+    /* top: 20vh; */
+    left: 0;
+    height: 70vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: space-around; */
+    row-gap: 8vh;
+}
+
+.clickable {
+    height: 17vh;
+    width: 25vw;
+    background-color: rgb(123, 17, 19);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 6vh;
+    border-radius: 20px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: white;
 }
