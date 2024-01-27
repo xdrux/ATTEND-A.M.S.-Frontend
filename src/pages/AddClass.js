@@ -15,6 +15,7 @@ class AddClass extends React.Component {
             back: false,
             courseName: "", // Added state for course name
             courseCode: "", // Added state for course code
+            classSection: "",
             selectedStartDate: null,
             startdatePickerOpen: false,
             selectedEndDate: null,
@@ -38,12 +39,13 @@ class AddClass extends React.Component {
         clearTimeout(this.timeout); // Clear the timeout on component unmount
     }
 
+
     validateForm = () => {
-        const { courseName, courseCode, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
+        const { courseName, courseCode, classSection, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
         var errors = "";
         var isComplete = true;
         // Perform your validation logic here
-        if (courseName.trim().length === 0 || !courseCode.trim().length === 0 || !selectedStartDate || !selectedEndDate || !selectedStartTime || !selectedEndTime || selectedWeekdays.length === 0) {
+        if (courseName.trim().length === 0 || courseCode.trim().length === 0 || classSection.trim().length === 0 || !selectedStartDate || !selectedEndDate || !selectedStartTime || !selectedEndTime || selectedWeekdays.length === 0) {
             isComplete = false;
             // Display an error message or take appropriate action
             if (courseName.trim().length === 0) {
@@ -51,6 +53,10 @@ class AddClass extends React.Component {
             }
             if (courseCode.trim().length === 0) {
                 errors += "<p>*Course Code is required</p>";
+            }
+
+            if (classSection.trim().length === 0) {
+                errors += "<p>*Course Section is required</p>";
             }
 
             if (selectedWeekdays.length === 0) {
@@ -76,8 +82,42 @@ class AddClass extends React.Component {
 
     handleAddClick = () => {
         if (this.validateForm()) {
+            const weekdayNumberMap = {
+                'mon': 1,
+                'tue': 2,
+                'wed': 3,
+                'thu': 4,
+                'fri': 5,
+            };
             // Proceed with adding the class logic here
-            console.log("Form is valid. Add class logic can be executed.");
+            const { courseName, courseCode, classSection, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
+            const selectedWeekdayNumbers = selectedWeekdays.map(weekday => weekdayNumberMap[weekday]);
+            // console.log(selectedWeekdayNumbers)
+
+            const courseNSec = courseCode.concat(" ", classSection)
+            console.log(courseNSec)
+            const course = {
+                courseName: courseName,
+                courseCode: courseCode,
+                courseSection: classSection,
+                courseNameSection: courseNSec,
+                courseSchedule: selectedWeekdayNumbers,
+                courseStartDate: selectedStartDate,
+                courseEndDate: selectedEndDate,
+                courseStartTime: selectedStartTime,
+                courseEndTime: selectedEndTime,
+            }
+
+
+            fetch(
+                "http://localhost:3001/AddCourse",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(course)
+                })
         } else {
             console.log("Hi");
         }
@@ -93,6 +133,10 @@ class AddClass extends React.Component {
 
     handleCourseCodeChange = (event) => {
         this.setState({ courseCode: event.target.value });
+    };
+
+    handleClassSectionChange = (event) => {
+        this.setState({ classSection: event.target.value });
     };
 
     handleStartDateChange = (date) => {
@@ -150,7 +194,7 @@ class AddClass extends React.Component {
     };
 
     render() {
-        const { courseName, courseCode, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
+        const { courseName, courseCode, classSection, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
         return (
             <div className="Bg">
                 <div className={`fade-in ${this.state.isActive ? 'active' : ''}`}>
@@ -190,6 +234,19 @@ class AddClass extends React.Component {
                                 required
                             />
                             <p id='e-courseCode' className='S-Error'></p>
+                        </div>
+                        <div className="formItem">
+                            <label className="FormLabel" htmlFor="classSection">Class Section</label>
+                            <input
+                                type="text"
+                                name="classSection"
+                                className="FormTextArea"
+                                id="classSection"
+                                value={classSection}
+                                onChange={this.handleClassSectionChange}
+                                required
+                            />
+                            <p id='e-courseSection' className='S-Error'></p>
                         </div>
                         <div className="formItem">
                             <p className="FormLabel">Class Schedule</p>

@@ -11,7 +11,7 @@ class Classes extends React.Component {
         this.state = {
             isActive: false,
             back: false,
-            classes: [1, 2, 3, 4, 5],
+            classes: [],
             selectedClass: null
         };
     }
@@ -21,7 +21,15 @@ class Classes extends React.Component {
             this.setState({ isActive: true });
         }, 100);
 
-        this.createClasses();
+        fetch("http://localhost:3001/getClasses")
+            .then(response => response.json())
+            .then(body => {
+                console.log(body)
+                this.setState({ classes: body });
+                this.createClasses();
+            });
+
+
     }
 
     componentWillUnmount() {

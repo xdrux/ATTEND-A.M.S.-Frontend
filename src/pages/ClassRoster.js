@@ -1,13 +1,97 @@
 import React from "react";
 import { useParams } from 'react-router-dom';
+import './css/common.css';
+import './css/ClassRoster.css'
+import backIcon from './../assets/back.png'
+import logo from './../assets/appLogo.png';
+import trash from './../assets/trash.png';
+import { Navigate } from "react-router-dom";
 
 class ClassRoster extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isActive: false,
+            back: false,
+            isAddStudentClicked: false,
+            students: ["Andreau Aranton", "Dru", "ANdru", "Andreau Aranton", "Dru", "ANdru", "Andreau Aranton", "Dru", "ANdru", "Andreau Aranton", "Dru", "ANdru"]
+        };
+    }
+
+    componentDidMount() {
+        // Set isActive to true after a short delay to trigger the fade-in effect
+        this.timeout = setTimeout(() => {
+            this.setState({ isActive: true });
+        }, 100); // Adjust the delay time as needed
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout); // Clear the timeout on component unmount
+    }
+
+    handleBackClick = () => {
+        this.setState({ back: true });
+    };
+
+    handleAddStudentClick = () => {
+        this.setState({ isAddStudentClicked: true });
+    }
+
     render() {
+        const { isAddStudentClicked, students } = this.state;
+
+        if (isAddStudentClicked) {
+            const url = `/Register/MyClasses/ClassRoster/${this.props.classId}/AddStudent`;
+            console.log(url);
+            return <Navigate to={url} replace />;
+        }
+
         return (
             <div>
-                Class ID: {this.props.classId}
+                {/* Class ID: {this.props.classId} */}
+                <div className="Bg">
+                    <div className={`fade-in ${this.state.isActive ? 'active' : ''}`}>
+                        <div className="Header">
+                            {this.state.back ? (<Navigate to="/Register/MyClasses" />) :
+                                (<img onClick={this.handleBackClick} className="BackIcon" src={backIcon} alt="back" />)
+                            }
+                            <p className="HeaderText">{this.props.classId}</p>
+
+                            <div className="addStudentButton" onClick={this.handleAddStudentClick}>
+                                <p className="addButtonText">Add Student</p>
+                            </div>
+                            <div className="downloadDataButton" onClick={this.handleAddClick}>
+                                <p className="addButtonText">Download Data</p>
+                            </div>
+                        </div>
+                        <img id="bigTrashIcon" onClick={this.handleBackClick} src={trash} alt="trash" />
+                        <div id="rosterContentBlock">
+                            <p id="rosterText">Class Roster</p>
+                            <div id="mainRosterBlock">
+                                <div id="rosterContainer">
+                                    <div id="rosterSpaceContainer">
+                                        {
+                                            students.map((student, index) => {
+                                                return (
+                                                    <div key={index} className="studentBlock">
+                                                        <p className="rosterStudName">{student}</p>
+                                                        <img id={index} onClick={this.handleBackClick} className="trashIcon" src={trash} alt="trash" />
+                                                    </div>
+                                                )
+                                            })
+                                        }
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <img className="AppLogo" src={logo} alt="logo" />
+                    </div>
+                </div>
+
                 {/* Render your component content here */}
-            </div>
+            </div >
         );
     }
 }

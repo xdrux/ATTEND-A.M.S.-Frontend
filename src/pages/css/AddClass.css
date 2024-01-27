@@ -29,6 +29,7 @@
     justify-content: space-between;
     /* column-gap: 7vw; */
     color: rgb(123, 17, 19);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     /* Use flexbox to arrange checkboxes horizontally */
 }
 
