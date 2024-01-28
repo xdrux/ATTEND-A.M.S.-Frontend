@@ -77,6 +77,9 @@ class AddStudent extends React.Component {
 
         // Close the overlay
         this.hideOverlay();
+
+        const fSampleText = document.getElementById("addFSampleText");
+        fSampleText.innerText = "Completed";
     };
 
 
@@ -155,7 +158,7 @@ class AddStudent extends React.Component {
                         </div>
                         <div className="formItem">
                             <label className="FormLabel" htmlFor="middleName">Face Samples</label>
-                            <div className="FormTextArea" id="addFaceSamplesButton" onClick={this.showOverlay}><p>Add</p></div>
+                            <div className="FormTextArea" id="addFaceSamplesButton" onClick={this.showOverlay}><p id="addFSampleText">Add</p></div>
                             <p id='e-courseSection' className='S-Error'></p>
                         </div>
                     </form>
@@ -182,9 +185,10 @@ class Overlay extends React.Component {
         this.webcamRef = React.createRef();
         this.canvasRef = React.createRef();
         this.state = {
-            inputData: '',
+            inputData: [],
             selectedVideoSource: null, // Initialize selected video source
             videoSources: [], // Available video sources
+            samplingInProgress: false,
         };
     }
 
@@ -209,6 +213,7 @@ class Overlay extends React.Component {
     };
 
     captureImage = () => {
+        var { inputData } = this.state;
         const canvas = this.canvasRef.current;
         const ctx = canvas.getContext('2d');
         const webcam = this.webcamRef.current.video;
@@ -220,9 +225,46 @@ class Overlay extends React.Component {
         croppedCanvas.height = 300;
         croppedCtx.putImageData(imageData, 0, 0);
         const base64String = croppedCanvas.toDataURL('image/jpeg');
-        console.log(base64String);
+        inputData.push(base64String);
+        this.setState({ inputData: inputData });
+        console.log(inputData.length);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         this.drawRectangle();
+    };
+
+    // Start sampling process
+    startSampling = () => {
+        var coundown = 10;
+        const countdownText = document.getElementById("samplingCountdown");
+        const startButton = document.getElementById("startButton");
+        startButton.style.display = "none";
+        const backButton = document.getElementById("overlayFCBack");
+        backButton.style.display = "none";
+        if (!this.state.samplingInProgress) {
+            this.setState({ samplingInProgress: true }, () => {
+                // Execute captureImage every 0.5 seconds for 5 seconds
+                const intervalId = setInterval(() => {
+                    this.captureImage();
+                    countdownText.innerText = Math.round((coundown - 1) / 2) + " seconds...";
+                    coundown--;
+                }, 500);
+
+
+                // Stop sampling process after 5 seconds
+                setTimeout(() => {
+                    clearInterval(intervalId);
+                    this.setState({ samplingInProgress: false });
+                    this.props.onDataSubmit(this.state.inputData);
+
+                    // Clear input data after submitting
+                    this.setState({ inputData: '' });
+
+                    // Close the overlay
+                    this.props.onClose();
+                }, 5000);
+            });
+        }
+
     };
 
     // drawRectangle() {
@@ -260,48 +302,63 @@ class Overlay extends React.Component {
         ctx.strokeStyle = 'white';
         ctx.stroke();
     }
+
     handleSubmit = () => {
         this.props.onDataSubmit(this.state.inputData);
         this.setState({ inputData: '' });
         this.props.onClose();
     };
 
+    handleBackClick = () => {
+        this.props.onClose();
+    }
+
     render() {
         return (
             <div className="overlay">
                 <div className="overlay-content">
-                    <div className="overlayHeader">
-                        <img onClick={this.handleBackClick} className="BackIconOverlay" src={backIcon} alt="back" />
-                        <p id="addFCText">Add Face Samples</p>
-                    </div>
+                    <div id="leftOverlay">
+                        <div className="overlayHeader">
+                            <img onClick={this.handleBackClick} id="overlayFCBack" className="BackIconOverlay" src={backIcon} alt="back" />
+                            <p id="addFCText">Add Face Samples</p>
+                        </div>
 
-                    {/* <button onClick={this.handleSubmit}>Submit Data</button>
+                        {/* <button onClick={this.handleSubmit}>Submit Data</button>
                     <button onClick={this.props.onClose}>Close Overlay</button> */}
-                    {/* Dropdown to select video source */}
-                    <select id="dropdownCam" onChange={this.handleVideoSourceChange}>
-                        <option value="">Select Video Source</option>
-                        {this.state.videoSources.map((source) => (
-                            source.kind === 'videoinput' && (
-                                <option key={source.deviceId} value={source.deviceId}>
-                                    {source.label || `Camera ${this.state.videoSources.indexOf(source) + 1}`}
-                                </option>
-                            )
-                        ))}
-                    </select>
-                    {/* Webcam component with selected video source */}
+                        {/* Dropdown to select video source */}
+                        <select id="dropdownCam" onChange={this.handleVideoSourceChange}>
+                            <option value="">Select Video Source</option>
+                            {this.state.videoSources.map((source) => (
+                                source.kind === 'videoinput' && (
+                                    <option key={source.deviceId} value={source.deviceId}>
+                                        {source.label || `Camera ${this.state.videoSources.indexOf(source) + 1}`}
+                                    </option>
+                                )
+                            ))}
+                        </select>
+                        {/* Webcam component with selected video source */}
+                        <div>
+                            <Webcam
+                                id="videoStream"
+                                audio={false}
+                                ref={this.webcamRef}
+                                width="50%"
+                                height="auto"
+                                videoConstraints={{
+                                    deviceId: this.state.selectedVideoSource ? { exact: this.state.selectedVideoSource } : undefined,
+                                }}
+                            />
+                            <canvas id="canvasPhoto" ref={this.canvasRef} width={640} height={480}></canvas>
+                        </div>
+                    </div>
                     <div>
-                        <Webcam
-                            id="videoStream"
-                            audio={false}
-                            ref={this.webcamRef}
-                            width="50%"
-                            height="auto"
-                            videoConstraints={{
-                                deviceId: this.state.selectedVideoSource ? { exact: this.state.selectedVideoSource } : undefined,
-                            }}
-                        />
-                        <canvas id="canvasPhoto" ref={this.canvasRef} width={640} height={480}></canvas>
-                        <button onClick={this.captureImage}>Capture Image</button>
+                        <div id="samplingDescription">
+                            <p id="samplingText">The sampling process would take around 5 seconds. Please keep a neutral face in the box and look directly at the camera.</p>
+                        </div>
+                        <p id="samplingCountdown"></p>
+                        <div id="startButton" onClick={this.startSampling}>
+                            <p id="startButtonText">Start</p>
+                        </div>
                     </div>
                 </div>
             </div>

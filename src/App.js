@@ -5,6 +5,9 @@ import AddClass from "./pages/AddClass";
 import Classes from "./pages/Classes";
 import ClassRosterWrapper from "./pages/ClassRoster";
 import AddStudentWrapper from "./pages/AddStudent";
+import { ToastContainer } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -19,6 +22,7 @@ function App() {
           <Route exact={false} path="/Register/MyClasses/ClassRoster/:classId/AddStudent" element={<AddStudentWrapper />} />
         </Routes>
       </BrowserRouter>
+      <ToastContainer />
     </div>
   );
 }

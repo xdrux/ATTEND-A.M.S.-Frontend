@@ -6,6 +6,8 @@ import logo from './../assets/appLogo.png';
 import { Navigate } from "react-router-dom";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { toast } from 'react-toastify';
+
 
 class AddClass extends React.Component {
     constructor(props) {
@@ -25,6 +27,7 @@ class AddClass extends React.Component {
             selectedEndTime: null,
             showEndTimePicker: false,
             selectedWeekdays: [],
+            goHome: false
         };
     }
 
@@ -117,7 +120,23 @@ class AddClass extends React.Component {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify(course)
-                })
+                }).then(response => response.json())
+                .then(body => {
+                    console.log(body);
+                    toast.success('Class Saved!', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light"
+                    });
+                    this.setState({ goHome: true });
+
+
+                });
         } else {
             console.log("Hi");
         }
@@ -194,7 +213,10 @@ class AddClass extends React.Component {
     };
 
     render() {
-        const { courseName, courseCode, classSection, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
+        const { courseName, courseCode, classSection, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays, goHome } = this.state;
+        if (goHome) {
+            return <Navigate to="/" />;
+        }
         return (
             <div className="Bg">
                 <div className={`fade-in ${this.state.isActive ? 'active' : ''}`}>
