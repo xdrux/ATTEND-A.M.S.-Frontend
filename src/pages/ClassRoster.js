@@ -14,6 +14,8 @@ class ClassRoster extends React.Component {
             isActive: false,
             back: false,
             isAddStudentClicked: false,
+            isDeleteAllClicked: false,
+            action: "",
             students: ["Andreau Aranton", "Dru", "ANdru", "Andreau Aranton", "Dru", "ANdru", "Andreau Aranton", "Dru", "ANdru", "Andreau Aranton", "Dru", "ANdru"]
         };
     }
@@ -33,12 +35,31 @@ class ClassRoster extends React.Component {
         this.setState({ back: true });
     };
 
+    handleBigDeleteClick = () => {
+        this.setState({ isDeleteAllClicked: true });
+    };
+
     handleAddStudentClick = () => {
         this.setState({ isAddStudentClicked: true });
     }
 
+    hideOverlay = () => {
+        this.setState({ isDeleteAllClicked: false });
+    };
+
+    handleOverlayData = (data) => {
+        // Handle the data received from the overlay
+        console.log('Data from overlay:', data);
+
+        // Update the state or perform other actions as needed
+        this.setState({ action: data });
+
+        // Close the overlay
+        this.hideOverlay();
+    };
+
     render() {
-        const { isAddStudentClicked, students } = this.state;
+        const { isAddStudentClicked, students, isDeleteAllClicked } = this.state;
 
         if (isAddStudentClicked) {
             const url = `/Register/MyClasses/ClassRoster/${this.props.classId}/AddStudent`;
@@ -64,7 +85,7 @@ class ClassRoster extends React.Component {
                                 <p className="addButtonText">Download Data</p>
                             </div>
                         </div>
-                        <img id="bigTrashIcon" onClick={this.handleBackClick} src={trash} alt="trash" />
+                        <img id="bigTrashIcon" onClick={this.handleBigDeleteClick} src={trash} alt="trash" />
                         <div id="rosterContentBlock">
                             <p id="rosterText">Class Roster</p>
                             <div id="mainRosterBlock">
@@ -90,7 +111,9 @@ class ClassRoster extends React.Component {
                     </div>
                 </div>
 
-                {/* Render your component content here */}
+                {isDeleteAllClicked && (
+                    <BigDeleteOverlay onDataSubmit={this.handleOverlayData} onClose={this.hideOverlay} />
+                )}
             </div >
         );
     }
@@ -103,3 +126,52 @@ const ClassRosterWrapper = () => {
 };
 
 export default ClassRosterWrapper;
+
+class BigDeleteOverlay extends React.Component {
+    // constructor(props) {
+    //     super(props);
+    //     this.state = {
+    //         action: "none",
+    //     };
+    // }
+
+
+    handleSubmit = () => {
+        this.props.onDataSubmit(this.state.inputData);
+        this.setState({ inputData: '' });
+        this.props.onClose();
+    };
+
+    handleBackClick = () => {
+        this.props.onClose();
+    }
+    handleWholeClassClick = () => {
+        this.props.onDataSubmit("whole");
+        this.props.onClose();
+    }
+    handleAllStudentsClick = () => {
+        this.props.onDataSubmit("students");
+        this.props.onClose();
+    }
+    handleNothingClick = () => {
+        this.props.onClose();
+    }
+
+    render() {
+        return (
+            <div className="overlay">
+                <div className="overlayDelete">
+                    <div id="upperODelete">
+                        <p>What do you want to delete?</p>
+                    </div>
+
+                    <div id="lowerODelete">
+                        <div className="deleteOButton" onClick={this.handleWholeClassClick}><p>The whole class</p></div>
+                        <div className="deleteOButton" onClick={this.handleAllStudentsClick}><p>Just all the students</p></div>
+                        <div className="deleteOButton" onClick={this.handleNothingClick}><p>Nothing</p></div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}

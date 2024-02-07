@@ -82,20 +82,67 @@ class AddStudent extends React.Component {
         fSampleText.innerText = "Completed";
     };
 
+    validateForm = () => {
+        const { studentNumber, firstName, lastName, faceSamples } = this.state;
+        var errors = "";
+        var isComplete = true;
+        // Perform your validation logic here
+        if (studentNumber.trim().length !== 9 || /^\d+$/.test(studentNumber) === false || firstName.trim().length === 0 || lastName.trim().length === 0 || faceSamples.length === 0) {
+            isComplete = false;
+            // Display an error message or take appropriate action
+            if (studentNumber.trim().length === 0) {
+                errors += "<p>*Student Number is required</p>";
+            }
+            if (studentNumber.trim().length !== 9 && studentNumber.trim().length !== 0) {
+                errors += "<p>*Wrong Student Number format</p>";
+            }
+            if (firstName.trim().length === 0) {
+                errors += "<p>*First Name is required</p>";
+            }
+
+            if (lastName.trim().length === 0) {
+                errors += "<p>*Last Name is required</p>";
+            }
+
+            if (faceSamples.length === 0) {
+                errors += "<p>*Face Samples are required</p>";
+            }
+            // alert("Please fill in all the required fields and select at least one weekday.");
+            // return false;
+        }
+
+        document.getElementById("addFormErrors").innerHTML = errors;
+
+
+        // Additional validation logic if needed
+
+        return isComplete;
+    };
+
+    handleAddClick = () => {
+        if (this.validateForm()) {
+
+        }
+    }
+
 
 
 
 
     render() {
-        const { studentNumber, firstName, lastName, middleName, isOverlayVisible } = this.state;
+        const { studentNumber, firstName, lastName, middleName, isOverlayVisible, back } = this.state;
+        if (back) {
+            const url = `/Register/MyClasses/ClassRoster/${this.props.classId}`;
+            console.log(url);
+            return <Navigate to={url} replace />;
+        }
         return (
             <div className="Bg">
                 <div className={`fade-in ${this.state.isActive ? 'active' : ''}`}>
                     <div id="addFormErrors"></div>
                     <div className="Header">
-                        {this.state.back ? (<Navigate to="/Register" />) :
-                            (<img onClick={this.handleBackClick} className="BackIcon" src={backIcon} alt="back" />)
-                        }
+                        <img onClick={this.handleBackClick} className="BackIcon" src={backIcon} alt="back" />
+
                         <p className="HeaderText">Add a Student</p>
 
                         <div className="addButton" onClick={this.handleAddClick}>
@@ -292,7 +339,7 @@ class Overlay extends React.Component {
         const canvRefLoc = document.getElementById('canvasPhoto');
         // canvRefLoc.style.backgroundColor = "green";
         canvRefLoc.style.position = 'absolute';
-        canvRefLoc.style.top = 25 + "vh";
+        canvRefLoc.style.top = 21 + "vh";
         canvRefLoc.style.left = 10 + "vw";
         const canvas = this.canvasRef.current;
         const ctx = canvas.getContext('2d');
