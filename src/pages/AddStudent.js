@@ -8,6 +8,7 @@ import './css/AddStudent.css';
 import './css/FaceCollectionOverlay.css'
 import { Navigate } from "react-router-dom";
 import 'react-datepicker/dist/react-datepicker.css';
+import { toast } from 'react-toastify';
 
 // import * as faceapi from 'face-api.js';
 import Webcam from 'react-webcam';
@@ -121,7 +122,43 @@ class AddStudent extends React.Component {
 
     handleAddClick = () => {
         if (this.validateForm()) {
+            const { studentNumber, firstName, lastName, middleName, faceSamples } = this.state;
+            const student = {
+                studentNumber: studentNumber,
+                firstName: firstName,
+                lastName: lastName,
+                middleName: middleName,
+                faceSamples: faceSamples,
+                courseNameSection: this.props.classId
+            }
+            fetch(
+                "http://localhost:3001/AddStudent",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(student)
+                }).then(response => response.json())
+                .then(body => {
+                    console.log(body);
+                    toast.success('Student Added!', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light"
+                    });
+                    setTimeout(() => {
+                        this.setState({ back: true });
+                    }, 400); // Delay of 2000 milliseconds (2 seconds)
 
+
+
+                });
         }
     }
 
@@ -313,24 +350,6 @@ class Overlay extends React.Component {
         }
 
     };
-
-    // drawRectangle() {
-    //     const element = document.getElementById('videoStream');
-    //     const rect = element.getBoundingClientRect();
-    //     console.log('Element position (relative to viewport):', rect.top, rect.left);
-    //     const canvRefLoc = document.getElementById('canvasPhoto');
-    //     canvRefLoc.style.position = 'absolute';
-    //     canvRefLoc.style.top = rect.top + 'px';
-    //     canvRefLoc.style.left = rect.left + 'px';
-    //     const canvas = this.canvasRef.current;
-    //     const ctx = canvas.getContext('2d');
-    //     ctx.beginPath();
-    //     ctx.rect(170, 80, 300, 300);
-    //     ctx.lineWidth = 4;
-    //     ctx.strokeStyle = 'white';
-    //     ctx.stroke();
-    // }
-
 
     drawRectangle() {
         const element = document.getElementById('videoStream');

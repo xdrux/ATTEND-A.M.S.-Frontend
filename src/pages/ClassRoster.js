@@ -6,6 +6,8 @@ import backIcon from './../assets/back.png'
 import logo from './../assets/appLogo.png';
 import trash from './../assets/trash.png';
 import { Navigate } from "react-router-dom";
+import JSZip from 'jszip';
+
 
 class ClassRoster extends React.Component {
     constructor(props) {
@@ -16,7 +18,9 @@ class ClassRoster extends React.Component {
             isAddStudentClicked: false,
             isDeleteAllClicked: false,
             action: "",
-            students: ["Andreau Aranton", "Dru", "ANdru", "Andreau Aranton", "Dru", "ANdru", "Andreau Aranton", "Dru", "ANdru", "Andreau Aranton", "Dru", "ANdru"]
+            students: [],
+            folderNames: null,
+            faceSamples: null
         };
     }
 
@@ -25,6 +29,22 @@ class ClassRoster extends React.Component {
         this.timeout = setTimeout(() => {
             this.setState({ isActive: true });
         }, 100); // Adjust the delay time as needed
+
+        const section = {
+            courseNameSection: this.props.classId
+        }
+        fetch(
+            "http://localhost:3001/getStudentsName",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(section)
+            }).then(response => response.json())
+            .then(body => {
+                this.setState({ students: body });
+            });
     }
 
     componentWillUnmount() {
@@ -41,7 +61,47 @@ class ClassRoster extends React.Component {
 
     handleAddStudentClick = () => {
         this.setState({ isAddStudentClicked: true });
-    }
+    };
+
+    handleDownloadDataClick = () => {
+        const section = {
+            courseNameSection: this.props.classId
+        }
+
+        fetch(
+            "http://localhost:3001/downloadClassInfo",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(section)
+            }).then(response => response.json())
+            .then(body => {
+                console.log(body);
+
+                // const { base64Strings, folderNames } = this.state;
+                const zip = new JSZip();
+
+                body[0].forEach((folderName, index) => {
+                    const folder = zip.folder(folderName);
+
+                    body[1][index].forEach((base64String, idx) => {
+                        const imageData = base64String.split(';base64,')[1];
+                        folder.file(`image_${idx + 1}.jpg`, imageData, { base64: true });
+                    });
+                });
+
+                zip.generateAsync({ type: 'blob' }).then(content => {
+                    const url = window.URL.createObjectURL(content);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', `${this.props.classId}.zip`);
+                    document.body.appendChild(link);
+                    link.click();
+                });
+            });
+    };
 
     hideOverlay = () => {
         this.setState({ isDeleteAllClicked: false });
@@ -81,7 +141,7 @@ class ClassRoster extends React.Component {
                             <div className="addStudentButton" onClick={this.handleAddStudentClick}>
                                 <p className="addButtonText">Add Student</p>
                             </div>
-                            <div className="downloadDataButton" onClick={this.handleAddClick}>
+                            <div className="downloadDataButton" onClick={this.handleDownloadDataClick}>
                                 <p className="addButtonText">Download Data</p>
                             </div>
                         </div>
