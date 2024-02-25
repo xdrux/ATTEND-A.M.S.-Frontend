@@ -74,6 +74,25 @@ class AddClass extends React.Component {
             // alert("Please fill in all the required fields and select at least one weekday.");
             // return false;
         }
+        // console.log(new Date(selectedEndDate))
+
+        if ((new Date(selectedStartDate) > new Date(selectedEndDate)) && selectedStartDate & selectedEndDate) {
+            isComplete = false;
+            errors += "<p>*Start Date must be earlier</p>";
+        }
+
+        if (selectedStartTime && selectedEndTime) {
+            // Convert time strings to Date objects
+            var time1 = new Date("1970-01-01T" + selectedStartTime);
+            var time2 = new Date("1970-01-01T" + selectedEndTime);
+
+            // Compare the times
+            if (time1 > time2) {
+                isComplete = false;
+                errors += "<p>*Start Time must be earlier</p>";
+
+            }
+        }
 
         document.getElementById("addFormErrors").innerHTML = errors;
 

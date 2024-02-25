@@ -7,6 +7,7 @@ import logo from './../assets/appLogo.png';
 import trash from './../assets/trash.png';
 import { Navigate } from "react-router-dom";
 import JSZip from 'jszip';
+import { toast } from 'react-toastify';
 
 
 class ClassRoster extends React.Component {
@@ -58,6 +59,42 @@ class ClassRoster extends React.Component {
     handleBigDeleteClick = () => {
         this.setState({ isDeleteAllClicked: true });
     };
+
+    handleTrashDeleteClick = (student) => {
+        console.log(student);
+
+        const body = {
+            courseNameSection: this.props.classId,
+            fullName: student
+        }
+
+        fetch(
+            "http://localhost:3001/deleteStudent",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            }).then(response => response.json())
+            .then(body => {
+                console.log(body);
+                this.setState(prevState => ({
+                    students: prevState.students.filter(s => s !== student)
+                }));
+                toast.success('Student Deleted!', {
+                    position: "bottom-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light"
+                });
+            });
+
+    }
 
     handleAddStudentClick = () => {
         this.setState({ isAddStudentClicked: true });
@@ -112,7 +149,62 @@ class ClassRoster extends React.Component {
         console.log('Data from overlay:', data);
 
         // Update the state or perform other actions as needed
-        this.setState({ action: data });
+        // this.setState({ action: data });
+        if (data === "whole") {
+            const section = {
+                courseNameSection: this.props.classId
+            }
+            fetch(
+                "http://localhost:3001/deleteCourse",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(section)
+                }).then(response => response.json())
+                .then(body => {
+                    this.setState({ back: true })
+                    toast.success('Class Deleted!', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light"
+                    });
+                });
+
+        } else if (data === "students") {
+            const section = {
+                courseNameSection: this.props.classId
+            }
+            fetch(
+                "http://localhost:3001/deleteAllStudents",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(section)
+                }).then(response => response.json())
+                .then(body => {
+                    this.setState({ students: [] })
+                    toast.success('Students Deleted!', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light"
+                    });
+                    // window.location.reload();
+                });
+        }
 
         // Close the overlay
         this.hideOverlay();
@@ -156,7 +248,7 @@ class ClassRoster extends React.Component {
                                                 return (
                                                     <div key={index} className="studentBlock">
                                                         <p className="rosterStudName">{student}</p>
-                                                        <img id={index} onClick={this.handleBackClick} className="trashIcon" src={trash} alt="trash" />
+                                                        <img id={index} onClick={() => this.handleTrashDeleteClick(student)} className="trashIcon" src={trash} alt="trash" />
                                                     </div>
                                                 )
                                             })
@@ -226,9 +318,9 @@ class BigDeleteOverlay extends React.Component {
                     </div>
 
                     <div id="lowerODelete">
-                        <div className="deleteOButton" onClick={this.handleWholeClassClick}><p>The whole class</p></div>
-                        <div className="deleteOButton" onClick={this.handleAllStudentsClick}><p>Just all the students</p></div>
-                        <div className="deleteOButton" onClick={this.handleNothingClick}><p>Nothing</p></div>
+                        <div className="deleteOButton" onClick={this.handleWholeClassClick}><p>Entire class</p></div>
+                        <div className="deleteOButton" onClick={this.handleAllStudentsClick}><p>All the students</p></div>
+                        <div className="deleteOButton" onClick={this.handleNothingClick}><p>None</p></div>
                     </div>
                 </div>
             </div>
