@@ -6,6 +6,10 @@ import './css/ScanningPage.css'
 import backIcon from './../assets/back.png'
 import logo from './../assets/appLogo.png';
 import { Navigate } from "react-router-dom";
+// import { Html5QrcodeScanner } from 'html5-qrcode';
+import { BrowserBarcodeReader } from '@zxing/library';
+
+
 // import { toast } from 'react-toastify';
 
 import Webcam from 'react-webcam';
@@ -16,6 +20,7 @@ class ScanningPage extends React.Component {
         super(props);
         this.webcamRef = React.createRef();
         this.canvasRef = React.createRef();
+        this.codeReader = new BrowserBarcodeReader();
         this.state = {
             isActive: false,
             back: false,
@@ -25,6 +30,7 @@ class ScanningPage extends React.Component {
             students: [],
             folderNames: null,
             faceSamples: null,
+            isBarcodeActive: false,
 
             selectedVideoSource: null, // Initialize selected video source
             videoSources: [], // Available video sources
@@ -50,6 +56,10 @@ class ScanningPage extends React.Component {
         } catch (error) {
             console.error('Error enumerating video sources:', error);
         }
+    };
+
+    handleVideoSourceChange = (event) => {
+        this.setState({ selectedVideoSource: event.target.value });
     };
 
     componentWillUnmount() {
@@ -87,7 +97,7 @@ class ScanningPage extends React.Component {
         const canvRefLoc = document.getElementById('canvasPhotoScan');
         // canvRefLoc.style.backgroundColor = "green";
         canvRefLoc.style.position = 'absolute';
-        canvRefLoc.style.top = 25 + "vh";
+        canvRefLoc.style.top = 23 + "vh";
         canvRefLoc.style.left = 5 + "vw";
         const canvas = this.canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -97,6 +107,123 @@ class ScanningPage extends React.Component {
         ctx.strokeStyle = 'white';
         ctx.stroke();
     }
+
+    captureImage = () => {
+        // var { inputData } = this.state;
+        const canvas = this.canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        const webcam = this.webcamRef.current.video;
+        ctx.drawImage(webcam, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(170, 80, 300, 300);
+        const croppedCanvas = document.createElement('canvas');
+        const croppedCtx = croppedCanvas.getContext('2d');
+        croppedCanvas.width = 300;
+        croppedCanvas.height = 300;
+        croppedCtx.putImageData(imageData, 0, 0);
+        const base64String = croppedCanvas.toDataURL('image/jpeg');
+        console.log(base64String);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        this.drawRectangle();
+    };
+
+    // handleUseFaceRecog = () => {
+    //     const webcam = this.webcamRef.current.video;
+    //     const canvRefLoc = document.getElementById('canvasPhotoScan');
+    //     const infoContent = document.getElementById('infoContent');
+    //     const scanPhotoButton = document.getElementById("scanPhotoButton");
+    //     const scanBarcodeButton = document.getElementById("scanBarcodeButton");
+    //     const scanBarcodeText = document.getElementById("scanBarcodeText");
+    //     var ctx = canvRefLoc.getContext('2d');
+    //     ctx.clearRect(0, 0, canvRefLoc.width, canvRefLoc.height);
+    //     // canvRefLoc.style.visibility = "visible";
+
+    //     webcam.play();
+    //     scanBarcodeText.innerText = "Use Barcode"
+    //     scanPhotoButton.style.visibility = "visible";
+    //     scanBarcodeButton.onclick = this.handleBarcodeScan;
+    //     ctx.clearRect(0, 0, canvRefLoc.width, canvRefLoc.height);
+    //     infoContent.innerText = "Keep a neutral face in the box";
+    //     this.drawRectangle();
+    // }
+
+    handleBarcodeScan = async () => {
+        this.setState({ isBarcodeActive: !this.state.isBarcodeActive }, async () => {
+            const { isBarcodeActive } = this.state;
+            console.log(isBarcodeActive);
+
+            const codeReader = new BrowserBarcodeReader();
+            const webcam = this.webcamRef.current.video;
+            const canvRefLoc = document.getElementById('canvasPhotoScan');
+            const infoContent = document.getElementById('infoContent');
+            const scanPhotoButton = document.getElementById("scanPhotoButton");
+            const scanBarcodeText = document.getElementById("scanBarcodeText");
+            var ctx = canvRefLoc.getContext('2d');
+
+            if (isBarcodeActive === false) {
+                webcam.play();
+                scanBarcodeText.innerText = "Use Barcode"
+                scanPhotoButton.style.visibility = "visible";
+                ctx.clearRect(0, 0, canvRefLoc.width, canvRefLoc.height);
+                infoContent.innerText = "Keep a neutral face in the box";
+                this.drawRectangle();
+                window.location.reload()
+            } else {
+                scanBarcodeText.innerText = "Use face recognition"
+                scanPhotoButton.style.visibility = "hidden";
+                ctx.clearRect(0, 0, canvRefLoc.width, canvRefLoc.height);
+                this.drawRectangleBarcode();
+                infoContent.innerText = "Waiting for the barcode to be scanned"
+                webcam.pause();
+                console.log('Attempting barcode scanning...');
+                try {
+                    const result = await codeReader.decodeFromVideoElement(webcam, this.handleBarcodeResult);
+                    console.log('Barcode result1:', result.text);
+                    // Do something with the barcode result, such as updating state
+                } catch (error) {
+                    console.error('Barcode scanning error:', error);
+                } finally {
+                    webcam.play();
+                    scanBarcodeText.innerText = "Use Barcode"
+                    scanPhotoButton.style.visibility = "visible";
+                    ctx.clearRect(0, 0, canvRefLoc.width, canvRefLoc.height);
+                    infoContent.innerText = "Keep a neutral face in the box";
+                    this.drawRectangle();
+                    this.setState({ isBarcodeActive: false })
+                }
+            }
+        });
+    };
+
+
+
+    handleBarcodeResult = (result) => {
+        console.log('Barcode result2:', result.text);
+        // Do something with the barcode result, such as updating state
+    };
+
+    drawRectangleBarcode() {
+        const element = document.getElementById('videoStreamScan');
+        const rect = element.getBoundingClientRect();
+        console.log('Element position (relative to viewport):', rect.top, rect.left);
+        const canvRefLoc = document.getElementById('canvasPhotoScan');
+        // canvRefLoc.style.backgroundColor = "green";
+        canvRefLoc.style.position = 'absolute';
+        canvRefLoc.style.top = 23 + "vh";
+        canvRefLoc.style.left = 5 + "vw";
+        const canvas = this.canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        ctx.beginPath();
+        ctx.rect(170, 280, 300, 100);
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = 'white';
+        ctx.stroke();
+    }
+
+
+
+
+
+
 
     render() {
 
@@ -140,6 +267,14 @@ class ScanningPage extends React.Component {
                             />
                             <canvas id="canvasPhotoScan" ref={this.canvasRef} width={640} height={480}></canvas>
                         </div>
+                        <div id="scanButtonsContainer">
+                            <div className="scanButton" id="scanPhotoButton" onClick={this.captureImage}>
+                                <p className="scanButtonText">Scan</p>
+                            </div>
+                            <div className="scanButton" id="scanBarcodeButton" onClick={this.handleBarcodeScan}>
+                                <p className="scanButtonText" id="scanBarcodeText">Use Barcode</p>
+                            </div>
+                        </div>
 
 
 
@@ -147,8 +282,6 @@ class ScanningPage extends React.Component {
                         <img className="AppLogo" src={logo} alt="logo" />
                     </div>
                 </div>
-
-
             </div >
         );
     }
