@@ -36,7 +36,7 @@
     color: rgb(123, 17, 19);
 }
 
-#scanButtonsContainer {
+#scanRightSideContainer {
     position: absolute;
     height: 90vh;
     width: 50vw;
@@ -45,8 +45,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    row-gap: 5vh;
+    /* justify-content: center; */
+    row-gap: 15vh;
 }
 
 .scanButton {
@@ -63,4 +63,32 @@
     color: white;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-size: 3.5vh;
+}
+
+#dateTimeContainer {
+    margin-top: 10vh;
+}
+
+.datetimeContent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(123, 17, 19);
+    font-weight: bold;
+}
+
+#timeContainer {
+    font-size: 13vh;
+}
+
+#dateContainer {
+    font-size: 5vh;
+}
+
+#scanButtonsContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5vh;
 }

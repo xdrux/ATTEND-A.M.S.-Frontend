@@ -31,9 +31,11 @@ class ScanningPage extends React.Component {
             folderNames: null,
             faceSamples: null,
             isBarcodeActive: false,
-
+            scanningBarcode: false,
             selectedVideoSource: null, // Initialize selected video source
             videoSources: [], // Available video sources
+            currentDate: '',
+            currentTime: ''
         };
     }
 
@@ -45,6 +47,13 @@ class ScanningPage extends React.Component {
 
         this.getVideoSources(); // Fetch available video sources when component mounts
         this.drawRectangle();
+
+        this.intervalID = setInterval(() => {
+            this.updateDateTime();
+        }, 1000);
+
+        // Initial update
+        this.updateDateTime();
     }
 
 
@@ -64,6 +73,21 @@ class ScanningPage extends React.Component {
 
     componentWillUnmount() {
         clearTimeout(this.timeout); // Clear the timeout on component unmount
+        clearInterval(this.intervalID);
+    }
+
+    updateDateTime() {
+        const currentDateTime = new Date();
+        const optionsDate = { month: 'long', day: '2-digit', year: 'numeric' };
+        const optionsTime = { hour: '2-digit', minute: '2-digit', hour12: true };
+
+        const dateString = currentDateTime.toLocaleDateString('en-US', optionsDate);
+        const timeString = currentDateTime.toLocaleTimeString('en-US', optionsTime);
+
+        this.setState({
+            currentDate: dateString,
+            currentTime: timeString
+        });
     }
 
     handleBackClick = () => {
@@ -120,8 +144,67 @@ class ScanningPage extends React.Component {
         croppedCanvas.width = 300;
         croppedCanvas.height = 300;
         croppedCtx.putImageData(imageData, 0, 0);
-        const base64String = croppedCanvas.toDataURL('image/jpeg');
-        console.log(base64String);
+        // const base64String = croppedCanvas.toDataURL('image/jpeg');
+        // console.log(base64String);
+
+        // Convert the cropped canvas to a Blob (image file)
+        croppedCanvas.toBlob(blob => {
+            // Create FormData and append the image file and filename
+            const formData = new FormData();
+            formData.append('image', blob, 'image.jpg'); // 'image.jpg' is the filename
+            formData.append('filename', this.props.classId);
+
+            fetch('http://127.0.0.1:4000/predict', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    const currentDate = new Date();
+
+                    // Get the formatted date string
+                    const formattedDateString = currentDate.toDateString();
+
+                    const currentDate2 = new Date();
+
+                    // Get the current hours and minutes
+                    const currentHours = String(currentDate2.getHours()).padStart(2, '0');
+                    const currentMinutes = String(currentDate2.getMinutes()).padStart(2, '0');
+
+                    // Format the time as HH:MM
+                    const currentTime = `${currentHours}:${currentMinutes}`;
+                    const attendanceData = {
+                        studentNumber: data.predicted_face,
+                        dateToday: formattedDateString,
+                        timeIn: currentTime,
+                        courseNameSection: this.props.classId
+                    }
+
+                    console.log(attendanceData);
+
+                    fetch(
+                        "http://localhost:3001/logAttendance",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(attendanceData)
+                        }).then(response => response.json())
+                        .then(body => {
+                            console.log(body);
+                        });
+
+                    // Handle response from server if needed
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }, 'image/jpeg');
+
+
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         this.drawRectangle();
     };
@@ -147,6 +230,7 @@ class ScanningPage extends React.Component {
     // }
 
     handleBarcodeScan = async () => {
+        const { scanningBarcode } = this.state;
         this.setState({ isBarcodeActive: !this.state.isBarcodeActive }, async () => {
             const { isBarcodeActive } = this.state;
             console.log(isBarcodeActive);
@@ -166,30 +250,86 @@ class ScanningPage extends React.Component {
                 ctx.clearRect(0, 0, canvRefLoc.width, canvRefLoc.height);
                 infoContent.innerText = "Keep a neutral face in the box";
                 this.drawRectangle();
-                window.location.reload()
+                // window.location.reload()
             } else {
+                this.setState({ scanningBarcode: true })
                 scanBarcodeText.innerText = "Use face recognition"
                 scanPhotoButton.style.visibility = "hidden";
                 ctx.clearRect(0, 0, canvRefLoc.width, canvRefLoc.height);
                 this.drawRectangleBarcode();
                 infoContent.innerText = "Waiting for the barcode to be scanned"
-                webcam.pause();
-                console.log('Attempting barcode scanning...');
-                try {
-                    const result = await codeReader.decodeFromVideoElement(webcam, this.handleBarcodeResult);
-                    console.log('Barcode result1:', result.text);
-                    // Do something with the barcode result, such as updating state
-                } catch (error) {
-                    console.error('Barcode scanning error:', error);
-                } finally {
-                    webcam.play();
-                    scanBarcodeText.innerText = "Use Barcode"
-                    scanPhotoButton.style.visibility = "visible";
+                // webcam.pause();
+                if (scanningBarcode === false) {
+                    this.setState({ scanningBarcode: true })
+                    scanBarcodeText.innerText = "Use face recognition"
+                    scanPhotoButton.style.visibility = "hidden";
                     ctx.clearRect(0, 0, canvRefLoc.width, canvRefLoc.height);
-                    infoContent.innerText = "Keep a neutral face in the box";
-                    this.drawRectangle();
-                    this.setState({ isBarcodeActive: false })
+                    this.drawRectangleBarcode();
+                    infoContent.innerText = "Waiting for the barcode to be scanned"
+                    webcam.pause();
+                    console.log('Attempting barcode scanning...');
+                    try {
+                        const result = await codeReader.decodeFromVideoElement(webcam, this.handleBarcodeResult);
+                        console.log('Barcode result1:', result.text);
+
+                        let studNum = result.text;
+                        studNum = studNum.replace(/-/g, '');
+
+                        if (studNum.charAt(0) === '0') {
+                            // Remove the first character if it is '0'
+                            studNum = studNum.slice(1);
+                        }
+
+                        const currentDate = new Date();
+
+                        // Get the formatted date string
+                        const formattedDateString = currentDate.toDateString();
+
+                        const currentDate2 = new Date();
+
+                        // Get the current hours and minutes
+                        const currentHours = String(currentDate2.getHours()).padStart(2, '0');
+                        const currentMinutes = String(currentDate2.getMinutes()).padStart(2, '0');
+
+                        // Format the time as HH:MM
+                        const currentTime = `${currentHours}:${currentMinutes}`;
+                        const attendanceData = {
+                            studentNumber: studNum,
+                            dateToday: formattedDateString,
+                            timeIn: currentTime,
+                            courseNameSection: this.props.classId
+                        }
+
+                        console.log(attendanceData);
+
+                        fetch(
+                            "http://localhost:3001/logAttendance",
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(attendanceData)
+                            }).then(response => response.json())
+                            .then(body => {
+                                console.log(body);
+                            });
+                        alert(studNum)
+
+                        // Do something with the barcode result, such as updating state
+                    } catch (error) {
+                        console.error('Barcode scanning error:', error);
+                    } finally {
+                        webcam.play();
+                        scanBarcodeText.innerText = "Use Barcode"
+                        scanPhotoButton.style.visibility = "visible";
+                        ctx.clearRect(0, 0, canvRefLoc.width, canvRefLoc.height);
+                        infoContent.innerText = "Keep a neutral face in the box";
+                        this.drawRectangle();
+                        this.setState({ isBarcodeActive: false, scanningBarcode: false })
+                    }
                 }
+
             }
         });
     };
@@ -218,11 +358,6 @@ class ScanningPage extends React.Component {
         ctx.strokeStyle = 'white';
         ctx.stroke();
     }
-
-
-
-
-
 
 
     render() {
@@ -267,13 +402,20 @@ class ScanningPage extends React.Component {
                             />
                             <canvas id="canvasPhotoScan" ref={this.canvasRef} width={640} height={480}></canvas>
                         </div>
-                        <div id="scanButtonsContainer">
-                            <div className="scanButton" id="scanPhotoButton" onClick={this.captureImage}>
-                                <p className="scanButtonText">Scan</p>
+                        <div id="scanRightSideContainer">
+                            <div id="dateTimeContainer">
+                                <p id="timeContainer" className="datetimeContent">{this.state.currentTime}</p>
+                                <p id="dateContainer" className="datetimeContent">{this.state.currentDate}</p>
                             </div>
-                            <div className="scanButton" id="scanBarcodeButton" onClick={this.handleBarcodeScan}>
-                                <p className="scanButtonText" id="scanBarcodeText">Use Barcode</p>
+                            <div id="scanButtonsContainer">
+                                <div className="scanButton" id="scanPhotoButton" onClick={this.captureImage}>
+                                    <p className="scanButtonText">Scan</p>
+                                </div>
+                                <div className="scanButton" id="scanBarcodeButton" onClick={this.handleBarcodeScan}>
+                                    <p className="scanButtonText" id="scanBarcodeText">Use Barcode</p>
+                                </div>
                             </div>
+
                         </div>
 
 

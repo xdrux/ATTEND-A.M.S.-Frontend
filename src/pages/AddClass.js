@@ -7,6 +7,7 @@ import { Navigate } from "react-router-dom";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { toast } from 'react-toastify';
+// import moment from 'moment-timezone';
 
 
 class AddClass extends React.Component {
@@ -118,14 +119,24 @@ class AddClass extends React.Component {
 
             const courseNSec = courseCode.concat(" ", classSection)
             console.log(courseNSec)
+            // console.log(selectedStartDate, selectedEndDate)
+
+            const Date1 = selectedStartDate.toDateString();
+            // const dateString1 = Date1.format(); // Convert date to ISO string format
+
+            const Date2 = selectedEndDate.toDateString();
+            // const dateString2 = Date2.format(); // Convert date to ISO string format
+            console.log(Date1, Date2)
+
+
             const course = {
                 courseName: courseName,
                 courseCode: courseCode,
                 courseSection: classSection,
                 courseNameSection: courseNSec,
                 courseSchedule: selectedWeekdayNumbers,
-                courseStartDate: selectedStartDate,
-                courseEndDate: selectedEndDate,
+                courseStartDate: Date1,
+                courseEndDate: Date2,
                 courseStartTime: selectedStartTime,
                 courseEndTime: selectedEndTime,
             }
