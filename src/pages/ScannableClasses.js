@@ -25,8 +25,9 @@ class ScannableClasses extends React.Component {
             .then(response => response.json())
             .then(body => {
                 console.log(body)
-                this.setState({ classes: body.h5_files });
-                this.createClasses();
+                this.setState({ classes: body.h5_files }, () => {
+                    this.createClasses(); // Call createClasses() after setState() completes
+                });
             });
 
 

@@ -2,12 +2,18 @@ import React from "react";
 import { useParams } from 'react-router-dom';
 import './css/common.css';
 import './css/ClassRoster.css';
-import './css/ScanningPage.css'
+import './css/ScanningPage.css';
+import './css/ScanResult.css';
+
 import backIcon from './../assets/back.png'
+import checkIcon from './../assets/checkIcon.png';
+import xIcon from './../assets/xIcon.png';
 import logo from './../assets/appLogo.png';
 import { Navigate } from "react-router-dom";
 // import { Html5QrcodeScanner } from 'html5-qrcode';
 import { BrowserBarcodeReader } from '@zxing/library';
+import ReactLoading from 'react-loading';
+import { toast } from 'react-toastify';
 
 
 // import { toast } from 'react-toastify';
@@ -25,7 +31,6 @@ class ScanningPage extends React.Component {
             isActive: false,
             back: false,
             isAddStudentClicked: false,
-            isDeleteAllClicked: false,
             action: "",
             students: [],
             folderNames: null,
@@ -35,7 +40,17 @@ class ScanningPage extends React.Component {
             selectedVideoSource: null, // Initialize selected video source
             videoSources: [], // Available video sources
             currentDate: '',
-            currentTime: ''
+            currentTime: '',
+            openOverlay: false,
+            dataForOverlay: {
+                result: "",
+                studentName: "",
+                studentNumber: "",
+                time: "",
+                message: "",
+                courseNameSection: ""
+            },
+            loading: false
         };
     }
 
@@ -95,13 +110,13 @@ class ScanningPage extends React.Component {
     };
 
     handleBigDeleteClick = () => {
-        this.setState({ isDeleteAllClicked: true });
+        this.setState({ openOverlay: true });
     };
 
 
 
     hideOverlay = () => {
-        this.setState({ isDeleteAllClicked: false });
+        this.setState({ openOverlay: false });
     };
 
     handleOverlayData = (data) => {
@@ -133,6 +148,7 @@ class ScanningPage extends React.Component {
     }
 
     captureImage = () => {
+        this.setState({ loading: true });
         // var { inputData } = this.state;
         const canvas = this.canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -194,6 +210,31 @@ class ScanningPage extends React.Component {
                         }).then(response => response.json())
                         .then(body => {
                             console.log(body);
+                            if (body.status === "success") {
+                                this.setState({
+                                    dataForOverlay: {
+                                        result: "success",
+                                        studentName: body.identity,
+                                        studentNumber: attendanceData.studentNumber,
+                                        time: attendanceData.timeIn,
+                                        message: "",
+                                        courseNameSection: this.props.classId
+                                    }
+                                }, () => {
+                                    // This callback will execute after the state has been updated
+                                    this.setState({ openOverlay: true, loading: false });
+                                });
+                            } else {
+                                this.setState({
+                                    dataForOverlay: {
+                                        result: "failed",
+                                        message: body.message,
+                                    },
+                                }, () => {
+                                    // This callback will execute after the state has been updated
+                                    this.setState({ openOverlay: true, loading: false });
+                                })
+                            }
                         });
 
                     // Handle response from server if needed
@@ -271,6 +312,7 @@ class ScanningPage extends React.Component {
                     try {
                         const result = await codeReader.decodeFromVideoElement(webcam, this.handleBarcodeResult);
                         console.log('Barcode result1:', result.text);
+                        this.setState({ loading: true });
 
                         let studNum = result.text;
                         studNum = studNum.replace(/-/g, '');
@@ -313,8 +355,33 @@ class ScanningPage extends React.Component {
                             }).then(response => response.json())
                             .then(body => {
                                 console.log(body);
+                                if (body.status === "success") {
+                                    this.setState({
+                                        dataForOverlay: {
+                                            result: "success",
+                                            studentName: body.identity,
+                                            studentNumber: attendanceData.studentNumber,
+                                            time: attendanceData.timeIn,
+                                            message: "",
+                                            courseNameSection: this.props.classId
+                                        }
+                                    }, () => {
+                                        // This callback will execute after the state has been updated
+                                        this.setState({ openOverlay: true, loading: false });
+                                    });
+                                } else {
+                                    this.setState({
+                                        dataForOverlay: {
+                                            result: "failed",
+                                            message: body.message,
+                                        },
+                                    }, () => {
+                                        // This callback will execute after the state has been updated
+                                        this.setState({ openOverlay: true, loading: false });
+                                    })
+                                }
                             });
-                        alert(studNum)
+                        // alert(studNum)
 
                         // Do something with the barcode result, such as updating state
                     } catch (error) {
@@ -361,10 +428,15 @@ class ScanningPage extends React.Component {
 
 
     render() {
-
-
+        const { openOverlay, dataForOverlay, loading } = this.state;
+        const loadingColor = 'rgb(123, 17, 19)';
         return (
             <div>
+                {loading && (
+                    <div className="loading-container">
+                        <ReactLoading type={'spin'} color={loadingColor} height={'13%'} width={'13%'} />
+                    </div>
+                )}
                 {/* Class ID: {this.props.classId} */}
                 <div className="Bg">
                     <div className={`fade-in ${this.state.isActive ? 'active' : ''}`}>
@@ -376,7 +448,7 @@ class ScanningPage extends React.Component {
 
                         </div>
                         <div id="infoContainer">
-                            <p id="infoContent">Keep a neutral face in the box</p>
+                            <p id="infoContent">Ensure that the face touches the box</p>
                         </div>
                         <select id="dropdownCamScan" onChange={this.handleVideoSourceChange}>
                             <option value="">Select Video Source</option>
@@ -424,6 +496,18 @@ class ScanningPage extends React.Component {
                         <img className="AppLogo" src={logo} alt="logo" />
                     </div>
                 </div>
+                {/* {openOverlay && (
+                    <BigDeleteOverlay onDataSubmit={this.handleOverlayData} onClose={this.hideOverlay} dataFromScanningPage={{
+                        result: "success",
+                        studentName: "Andreau Orona Aranton",
+                        studentNumber: "202000947",
+                        time: "01:23",
+                        message: "",
+                    }} />
+                )} */}
+                {openOverlay && (
+                    <BigDeleteOverlay onDataSubmit={this.handleOverlayData} onClose={this.hideOverlay} dataFromScanningPage={dataForOverlay} />
+                )}
             </div >
         );
     }
@@ -437,51 +521,139 @@ const ScanningPageWrapper = () => {
 
 export default ScanningPageWrapper;
 
-// class BigDeleteOverlay extends React.Component {
-//     // constructor(props) {
-//     //     super(props);
-//     //     this.state = {
-//     //         action: "none",
-//     //     };
-//     // }
+class BigDeleteOverlay extends React.Component {
+    // constructor(props) {
+    //     super(props);
+    //     this.state = {
+    //         action: "none",
+    //     };
+    // }
+
+    componentDidMount() {
+        this.updateCountdown();
+    }
+
+    updateCountdown = () => {
+        let countdown = 10; // Corrected variable name
+        const countdownText = document.getElementById("countdownResult");
+
+        const intervalId = setInterval(() => {
+            countdownText.innerText = Math.round((countdown - 1) / 2);
+            countdown--;
+
+            if (countdown === 0) {
+                clearInterval(intervalId); // Clear interval when countdown reaches 0
+                this.handleNothingClick();
+            }
+        }, 500);
+    }
 
 
-//     handleSubmit = () => {
-//         this.props.onDataSubmit(this.state.inputData);
-//         this.setState({ inputData: '' });
-//         this.props.onClose();
-//     };
 
-//     handleBackClick = () => {
-//         this.props.onClose();
-//     }
-//     handleWholeClassClick = () => {
-//         this.props.onDataSubmit("whole");
-//         this.props.onClose();
-//     }
-//     handleAllStudentsClick = () => {
-//         this.props.onDataSubmit("students");
-//         this.props.onClose();
-//     }
-//     handleNothingClick = () => {
-//         this.props.onClose();
-//     }
+    handleSubmit = () => {
+        this.props.onDataSubmit(this.state.inputData);
+        this.setState({ inputData: '' });
+        this.props.onClose();
+    };
 
-//     render() {
-//         return (
-//             <div className="overlay">
-//                 <div className="overlayDelete">
-//                     <div id="upperODelete">
-//                         <p>What do you want to delete?</p>
-//                     </div>
+    handleBackClick = () => {
+        this.props.onClose();
+    }
+    handleWholeClassClick = () => {
+        this.props.onDataSubmit("whole");
+        this.props.onClose();
+    }
+    handleNotYouClick = () => {
+        const dateNow = new Date();
+        const dateToday = dateNow.toDateString();
+        const { dataFromScanningPage } = this.props;
+        const studentData = {
+            courseNameSection: dataFromScanningPage.courseNameSection,
+            studentNumber: dataFromScanningPage.studentNumber,
+            dateToday: dateToday
+        }
+        fetch(
+            "http://localhost:3001/cancelAttendance",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(studentData)
+            }).then(response => response.json())
+            .then(body => {
+                console.log(body);
+                this.props.onClose();
+                if (body.status === "success") {
+                    toast.success('Attendance Reversed!', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light"
+                    });
+                } else {
+                    toast.error('Error occured. Contact Administrator.', {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light"
+                    });
+                }
 
-//                     <div id="lowerODelete">
-//                         <div className="deleteOButton" onClick={this.handleWholeClassClick}><p>Entire class</p></div>
-//                         <div className="deleteOButton" onClick={this.handleAllStudentsClick}><p>All the students</p></div>
-//                         <div className="deleteOButton" onClick={this.handleNothingClick}><p>None</p></div>
-//                     </div>
-//                 </div>
-//             </div>
-//         )
-//     }
-// }
+            });
+    }
+    handleNothingClick = () => {
+        this.props.onClose();
+    }
+
+    render() {
+        const { dataFromScanningPage } = this.props;
+        console.log(dataFromScanningPage)
+        if (dataFromScanningPage.result !== "success") {
+            return (
+                <div className="overlay">
+                    <div className="overlayResult">
+                        <div id="upperBarR">
+                            <img id="checkIcon" src={xIcon} alt="check" />
+                            <p>Unsuccessful Recognition</p>
+                            <p id="countdownResult"></p>
+                        </div>
+
+                        <div id="lowerOResult">
+                            <p id="overlayTime">{dataFromScanningPage.message}</p>
+                            <div className="deleteOButton" onClick={this.handleNothingClick}><p>Okay</p></div>
+                        </div>
+                    </div>
+                </div>
+            )
+        } else {
+            return (
+                <div className="overlay">
+                    <div className="overlayResult">
+                        <div id="upperBar">
+                            <img id="checkIcon" src={checkIcon} alt="check" />
+                            <p>Successful Recognition</p>
+                            <p id="countdownResult"></p>
+                        </div>
+
+                        <div id="lowerOResult">
+                            <p id="overlayFullName">{dataFromScanningPage.studentName}</p>
+                            <p id="overlayStudNum">{dataFromScanningPage.studentNumber}</p>
+                            <p id="overlayTime">{dataFromScanningPage.time}</p>
+                            <div className="deleteOButton" onClick={this.handleNotYouClick}><p>Not you?</p></div>
+                        </div>
+                    </div>
+                </div>
+            )
+        }
+
+    }
+}

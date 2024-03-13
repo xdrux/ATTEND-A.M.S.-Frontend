@@ -1,0 +1,94 @@
+.overlayResult {
+    height: 50vh;
+    width: 35vw;
+    background-color: #D9D9D9;
+    border-radius: 20px;
+}
+
+.deleteOButton {
+    height: 8vh;
+    width: 20vw;
+    background-color: rgb(123, 17, 19);
+    color: white;
+    font-size: 3vh;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#upperBar {
+    height: 7vh;
+    width: 35vw;
+    display: flex;
+    align-items: center;
+    /* justify-content: center; */
+    font-size: 3vh;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: rgb(123, 17, 19);
+    background-color: lightgreen;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    gap: .1vw;
+    position: relative;
+
+}
+
+#upperBarR {
+    height: 7vh;
+    width: 35vw;
+    display: flex;
+    align-items: center;
+    /* justify-content: center; */
+    font-size: 3vh;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: rgb(123, 17, 19);
+    background-color: lightcoral;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    gap: .1vw;
+    position: relative;
+
+}
+
+#checkIcon {
+    height: 4.5vh;
+    margin-left: 1vw;
+    margin-right: .5vw;
+}
+
+#lowerOResult {
+    height: 43vh;
+    width: 35vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: rgb(123, 17, 19);
+    font-size: 3.5vh;
+}
+
+#overlayFullName {
+    font-size: 4.5vh;
+}
+
+
+
+.loading-container {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, .4);
+    /* Ensure the loading spinner is on top of other content */
+}
+
+#countdownResult {
+    position: absolute;
+    right: 1.5vw;
+}
