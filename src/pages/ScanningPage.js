@@ -572,6 +572,7 @@ class BigDeleteOverlay extends React.Component {
             studentNumber: dataFromScanningPage.studentNumber,
             dateToday: dateToday
         }
+        this.props.onClose();
         fetch(
             "http://localhost:3001/cancelAttendance",
             {
@@ -583,7 +584,6 @@ class BigDeleteOverlay extends React.Component {
             }).then(response => response.json())
             .then(body => {
                 console.log(body);
-                this.props.onClose();
                 if (body.status === "success") {
                     toast.success('Attendance Reversed!', {
                         position: "bottom-right",
@@ -617,6 +617,11 @@ class BigDeleteOverlay extends React.Component {
     render() {
         const { dataFromScanningPage } = this.props;
         console.log(dataFromScanningPage)
+        const [hours, minutes] = dataFromScanningPage.time.split(':');
+        let hour = parseInt(hours, 10);
+        const meridiem = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12; // Convert 0 to 12 for 12-hour format
+        hour = hour + ':' + minutes + ' ' + meridiem;
         if (dataFromScanningPage.result !== "success") {
             return (
                 <div className="overlay">
@@ -647,7 +652,7 @@ class BigDeleteOverlay extends React.Component {
                         <div id="lowerOResult">
                             <p id="overlayFullName">{dataFromScanningPage.studentName}</p>
                             <p id="overlayStudNum">{dataFromScanningPage.studentNumber}</p>
-                            <p id="overlayTime">{dataFromScanningPage.time}</p>
+                            <p id="overlayTime">{hour}</p>
                             <div className="deleteOButton" onClick={this.handleNotYouClick}><p>Not you?</p></div>
                         </div>
                     </div>

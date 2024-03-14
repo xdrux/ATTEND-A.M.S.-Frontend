@@ -7,6 +7,7 @@ import ScannableClasses from "./pages/ScannableClasses";
 import ClassRosterWrapper from "./pages/ClassRoster";
 import AddStudentWrapper from "./pages/AddStudent";
 import ScanningPageWrapper from "./pages/ScanningPage";
+import ExportClass from "./pages/ExportClass";
 import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -24,6 +25,7 @@ function App() {
           <Route exact={false} path="/Register/MyClasses/ClassRoster/:classId/AddStudent" element={<AddStudentWrapper />} />
           <Route exact={true} path="/Scan" element={<ScannableClasses />} />
           <Route exact={false} path="/Scan/:classId" element={<ScanningPageWrapper />} />
+          <Route exact={true} path="/Export" element={<ExportClass />} />
         </Routes>
       </BrowserRouter>
       <ToastContainer />

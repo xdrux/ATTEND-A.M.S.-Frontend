@@ -56,7 +56,7 @@ class Landing extends React.Component {
                                 <p className="landingButtonText">Scan</p>
                             </div>)
                         }
-                        {this.state.redirectToExport ? (<Navigate to="/ExportData" />) :
+                        {this.state.redirectToExport ? (<Navigate to="/Export" />) :
                             (<div className="LandingButton" onClick={this.handleExportClick}>
                                 <p className="landingButtonText">Export Data</p>
                             </div>)
