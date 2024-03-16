@@ -26,7 +26,7 @@ class ScannableClasses extends React.Component {
             .then(body => {
                 console.log(body)
                 this.setState({ classes: body.h5_files }, () => {
-                    this.createClasses(); // Call createClasses() after setState() completes
+                    this.createClasses();
                 });
             });
 
@@ -43,8 +43,6 @@ class ScannableClasses extends React.Component {
 
     handleClassClick = (clickedClass) => {
         console.log("Clicked class:", clickedClass);
-        // Add your logic here for handling the clicked class
-        // const selectedClass = { clickedClass };
         const isClicked = true;
         this.setState({ selectedClass: clickedClass, isClicked });
     };
@@ -76,7 +74,6 @@ class ScannableClasses extends React.Component {
         console.log(wrapper);
         document.getElementById("classList").innerHTML = wrapper;
 
-        // Add event listeners after setting innerHTML
         const clickableElements = document.getElementsByClassName("clickable");
         for (let i = 0; i < clickableElements.length; i++) {
             clickableElements[i].addEventListener("click", (event) => {

@@ -9,8 +9,6 @@ import './css/FaceCollectionOverlay.css'
 import { Navigate } from "react-router-dom";
 import 'react-datepicker/dist/react-datepicker.css';
 import { toast } from 'react-toastify';
-
-// import * as faceapi from 'face-api.js';
 import Webcam from 'react-webcam';
 
 class AddStudent extends React.Component {
@@ -19,8 +17,8 @@ class AddStudent extends React.Component {
         this.state = {
             isActive: false,
             back: false,
-            studentNumber: "", // Added state for course name
-            firstName: "", // Added state for course code
+            studentNumber: "",
+            firstName: "",
             lastName: "",
             middleName: "",
             isOverlayVisible: false,
@@ -62,7 +60,6 @@ class AddStudent extends React.Component {
 
     showOverlay = () => {
         this.setState({ isOverlayVisible: true });
-        // this.setState({ isOverlayVisible: false });
     };
 
     hideOverlay = () => {
@@ -70,15 +67,9 @@ class AddStudent extends React.Component {
     };
 
     handleOverlayData = (data) => {
-        // Handle the data received from the overlay
         console.log('Data from overlay:', data);
-
-        // Update the state or perform other actions as needed
         this.setState({ faceSamples: data });
-
-        // Close the overlay
         this.hideOverlay();
-
         const fSampleText = document.getElementById("addFSampleText");
         fSampleText.innerText = "Completed";
     };
@@ -87,10 +78,8 @@ class AddStudent extends React.Component {
         const { studentNumber, firstName, lastName, faceSamples } = this.state;
         var errors = "";
         var isComplete = true;
-        // Perform your validation logic here
         if (studentNumber.trim().length !== 9 || /^\d+$/.test(studentNumber) === false || firstName.trim().length === 0 || lastName.trim().length === 0 || faceSamples.length === 0) {
             isComplete = false;
-            // Display an error message or take appropriate action
             if (studentNumber.trim().length === 0) {
                 errors += "<p>*Student Number is required</p>";
             }
@@ -108,15 +97,8 @@ class AddStudent extends React.Component {
             if (faceSamples.length === 0) {
                 errors += "<p>*Face Samples are required</p>";
             }
-            // alert("Please fill in all the required fields and select at least one weekday.");
-            // return false;
         }
-
         document.getElementById("addFormErrors").innerHTML = errors;
-
-
-        // Additional validation logic if needed
-
         return isComplete;
     };
 
@@ -154,7 +136,7 @@ class AddStudent extends React.Component {
                     });
                     setTimeout(() => {
                         this.setState({ back: true });
-                    }, 400); // Delay of 2000 milliseconds (2 seconds)
+                    }, 400);
 
 
 
@@ -419,7 +401,7 @@ class Overlay extends React.Component {
                     </div>
                     <div>
                         <div id="samplingDescription">
-                            <p id="samplingText">The sampling process would take around 5 seconds. Please keep a neutral face in the box and look directly at the camera.</p>
+                            <p id="samplingText">The sampling process would take around 5 seconds. Please keep a neutral face in the box and look directly at the camera. Ensure that the face fully occupies the box.</p>
                         </div>
                         <p id="samplingCountdown"></p>
                         <div id="startButton" onClick={this.startSampling}>

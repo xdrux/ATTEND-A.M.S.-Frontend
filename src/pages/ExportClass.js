@@ -29,7 +29,7 @@ class ExportClass extends React.Component {
             .then(body => {
                 console.log(body)
                 this.setState({ classes: body.h5_files }, () => {
-                    this.createClasses(); // Call createClasses() after setState() completes
+                    this.createClasses();
                 });
             });
 
@@ -68,8 +68,6 @@ class ExportClass extends React.Component {
     handleClassClick = (clickedClass) => {
         this.setState({ loading: true });
         console.log("Clicked class:", clickedClass);
-        // Add your logic here for handling the clicked class
-        // const selectedClass = { clickedClass };
         const section = {
             courseNameSection: clickedClass
         }
@@ -189,7 +187,7 @@ class ExportClass extends React.Component {
                     // Create a download link and trigger click event
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = 'attendance.xlsx';
+                    a.download = `${clickedClass}_attendance.xlsx`;
                     a.click();
                     this.setState({ loading: false });
 
@@ -228,7 +226,6 @@ class ExportClass extends React.Component {
         console.log(wrapper);
         document.getElementById("classList").innerHTML = wrapper;
 
-        // Add event listeners after setting innerHTML
         const clickableElements = document.getElementsByClassName("clickable");
         for (let i = 0; i < clickableElements.length; i++) {
             clickableElements[i].addEventListener("click", (event) => {
@@ -238,13 +235,7 @@ class ExportClass extends React.Component {
     }
 
     render() {
-        // const { isClicked, selectedClass } = this.state;
 
-        // if (isClicked) {
-        //     const url = `/Scan/${selectedClass}`;
-        //     console.log(url);
-        //     return <Navigate to={url} replace />;
-        // }
         const { loading } = this.state;
         const loadingColor = 'rgb(123, 17, 19)';
         return (

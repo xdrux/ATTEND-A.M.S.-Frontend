@@ -8,6 +8,7 @@ import trash from './../assets/trash.png';
 import { Navigate } from "react-router-dom";
 import JSZip from 'jszip';
 import { toast } from 'react-toastify';
+import ReactLoading from 'react-loading';
 
 
 class ClassRoster extends React.Component {
@@ -21,31 +22,36 @@ class ClassRoster extends React.Component {
             action: "",
             students: [],
             folderNames: null,
-            faceSamples: null
+            faceSamples: null,
+            loading: false
         };
     }
 
     componentDidMount() {
-        // Set isActive to true after a short delay to trigger the fade-in effect
-        this.timeout = setTimeout(() => {
-            this.setState({ isActive: true });
-        }, 100); // Adjust the delay time as needed
 
-        const section = {
-            courseNameSection: this.props.classId
-        }
-        fetch(
-            "http://localhost:3001/getStudentsName",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(section)
-            }).then(response => response.json())
-            .then(body => {
-                this.setState({ students: body });
-            });
+        this.setState({ loading: true }, () => {
+            // Set isActive to true after a short delay to trigger the fade-in effect
+            this.timeout = setTimeout(() => {
+                this.setState({ isActive: true });
+            }, 100); // Adjust the delay time as needed
+            const section = {
+                courseNameSection: this.props.classId
+            }
+            fetch(
+                "http://localhost:3001/getStudentsName",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(section)
+                }).then(response => response.json())
+                .then(body => {
+                    this.setState({ students: body });
+                    this.setState({ loading: false });
+                });
+        });
+
     }
 
     componentWillUnmount() {
@@ -116,8 +122,6 @@ class ClassRoster extends React.Component {
             }).then(response => response.json())
             .then(body => {
                 console.log(body);
-
-                // const { base64Strings, folderNames } = this.state;
                 const zip = new JSZip();
 
                 body[0].forEach((folderName, index) => {
@@ -145,11 +149,8 @@ class ClassRoster extends React.Component {
     };
 
     handleOverlayData = (data) => {
-        // Handle the data received from the overlay
         console.log('Data from overlay:', data);
 
-        // Update the state or perform other actions as needed
-        // this.setState({ action: data });
         if (data === "whole") {
             const section = {
                 courseNameSection: this.props.classId
@@ -205,13 +206,12 @@ class ClassRoster extends React.Component {
                     // window.location.reload();
                 });
         }
-
-        // Close the overlay
         this.hideOverlay();
     };
 
     render() {
-        const { isAddStudentClicked, students, isDeleteAllClicked } = this.state;
+        const { isAddStudentClicked, students, isDeleteAllClicked, loading } = this.state;
+        const loadingColor = 'rgb(123, 17, 19)';
 
         if (isAddStudentClicked) {
             const url = `/Register/MyClasses/ClassRoster/${this.props.classId}/AddStudent`;
@@ -221,7 +221,12 @@ class ClassRoster extends React.Component {
 
         return (
             <div>
-                {/* Class ID: {this.props.classId} */}
+                {loading && (
+                    <div className="loading-container">
+                        <ReactLoading type={'spin'} color={loadingColor} height={'13%'} width={'13%'} />
+                    </div>
+                )}
+
                 <div className="Bg">
                     <div className={`fade-in ${this.state.isActive ? 'active' : ''}`}>
                         <div className="Header">
@@ -280,14 +285,6 @@ const ClassRosterWrapper = () => {
 export default ClassRosterWrapper;
 
 class BigDeleteOverlay extends React.Component {
-    // constructor(props) {
-    //     super(props);
-    //     this.state = {
-    //         action: "none",
-    //     };
-    // }
-
-
     handleSubmit = () => {
         this.props.onDataSubmit(this.state.inputData);
         this.setState({ inputData: '' });

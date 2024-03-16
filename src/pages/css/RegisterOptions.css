@@ -24,9 +24,7 @@
 
 .RegisterButtons:hover {
     transform: scale(1.05);
-    /* Adjust the scale factor as needed */
     transition: transform 0.3s ease;
-    /* Add a smooth transition effect */
 }
 
 .RegisterButtonsText {

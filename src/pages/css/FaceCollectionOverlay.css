@@ -9,8 +9,6 @@
     align-items: center;
     justify-content: center;
     background-color: rgba(0, 0, 0, 0.5);
-    /* Adjust as needed */
-    /* Other styling */
 }
 
 .overlay-content {
@@ -21,12 +19,10 @@
 }
 
 .BackIconOverlay {
-    /* position: relative;
-    top: 2vh;
-    left: 2.5vw; */
     height: 12vh;
     position: absolute;
     left: 2.5vw;
+    cursor: pointer;
 }
 
 #dropdownCam {
@@ -47,7 +43,6 @@
 .overlayHeader {
     display: flex;
     align-items: center;
-    /* justify-content: center; */
     position: relative;
     height: 16vh;
 }
@@ -71,7 +66,6 @@
     position: absolute;
     width: 38vw;
     height: 20%;
-    /* background-color: orange; */
     top: 25vh;
     right: 8.5vw;
 }
@@ -94,6 +88,7 @@
     position: absolute;
     top: 70vh;
     right: 21.5vw;
+    cursor: pointer;
 }
 
 #startButtonText {

@@ -11,7 +11,8 @@
 
 #landing-logo {
     width: 70vw;
-    /* Add any specific styles for your logo here */
+    pointer-events: none;
+    user-select: none;
 }
 
 .LandingButtonsBlock {
@@ -41,9 +42,7 @@
 
 .LandingButton:hover {
     transform: scale(1.05);
-    /* Adjust the scale factor as needed */
     transition: transform 0.3s ease;
-    /* Add a smooth transition effect */
 }
 
 .landingButtonText {

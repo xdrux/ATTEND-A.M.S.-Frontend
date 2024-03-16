@@ -9,7 +9,6 @@ body {
     position: relative;
     height: 100vh;
     width: 100vw;
-    /* Add other necessary styles for your content */
 }
 
 .Bg::after {
@@ -46,6 +45,7 @@ p {
     height: 15vh;
     margin-left: 2vw;
     cursor: pointer;
+
 }
 
 .HeaderText {
@@ -61,13 +61,14 @@ p {
     bottom: 1vh;
     right: 1vw;
     height: 8vh;
+    pointer-events: none;
+    user-select: none;
 }
 
 .fade-in {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.1s ease-in-out;
-    /* Adjust the duration and easing function as needed */
 }
 
 .fade-in.active {
@@ -106,6 +107,14 @@ p {
     height: 70vh;
     width: 100vw;
     overflow: auto;
+    cursor: pointer;
+}
+
+.clickable:hover {
+    transform: scale(1.03);
+    /* Adjust the scale factor as needed */
+    transition: transform 0.3s ease;
+    /* Add a smooth transition effect */
 }
 
 #classList::-webkit-scrollbar {
@@ -123,20 +132,17 @@ p {
 
 .classesBlock {
     display: flex;
-    /* font-size: 10vh; */
     width: 100vw;
     justify-content: space-around;
 }
 
 .classMainBlock {
     position: absolute;
-    /* top: 20vh; */
     left: 0;
     height: 70vh;
     width: 100vw;
     display: flex;
     flex-direction: column;
-    /* justify-content: space-around; */
     row-gap: 8vh;
 }
 

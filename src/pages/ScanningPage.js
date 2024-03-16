@@ -10,7 +10,6 @@ import checkIcon from './../assets/checkIcon.png';
 import xIcon from './../assets/xIcon.png';
 import logo from './../assets/appLogo.png';
 import { Navigate } from "react-router-dom";
-// import { Html5QrcodeScanner } from 'html5-qrcode';
 import { BrowserBarcodeReader } from '@zxing/library';
 import ReactLoading from 'react-loading';
 import { toast } from 'react-toastify';
@@ -120,12 +119,7 @@ class ScanningPage extends React.Component {
     };
 
     handleOverlayData = (data) => {
-        // Handle the data received from the overlay
         console.log('Data from overlay:', data);
-
-
-
-        // Close the overlay
         this.hideOverlay();
     };
 
@@ -134,7 +128,6 @@ class ScanningPage extends React.Component {
         const rect = element.getBoundingClientRect();
         console.log('Element position (relative to viewport):', rect.top, rect.left);
         const canvRefLoc = document.getElementById('canvasPhotoScan');
-        // canvRefLoc.style.backgroundColor = "green";
         canvRefLoc.style.position = 'absolute';
         canvRefLoc.style.top = 23 + "vh";
         canvRefLoc.style.left = 5 + "vw";
@@ -149,7 +142,6 @@ class ScanningPage extends React.Component {
 
     captureImage = () => {
         this.setState({ loading: true });
-        // var { inputData } = this.state;
         const canvas = this.canvasRef.current;
         const ctx = canvas.getContext('2d');
         const webcam = this.webcamRef.current.video;
@@ -160,8 +152,6 @@ class ScanningPage extends React.Component {
         croppedCanvas.width = 300;
         croppedCanvas.height = 300;
         croppedCtx.putImageData(imageData, 0, 0);
-        // const base64String = croppedCanvas.toDataURL('image/jpeg');
-        // console.log(base64String);
 
         // Convert the cropped canvas to a Blob (image file)
         croppedCanvas.toBlob(blob => {
@@ -250,25 +240,6 @@ class ScanningPage extends React.Component {
         this.drawRectangle();
     };
 
-    // handleUseFaceRecog = () => {
-    //     const webcam = this.webcamRef.current.video;
-    //     const canvRefLoc = document.getElementById('canvasPhotoScan');
-    //     const infoContent = document.getElementById('infoContent');
-    //     const scanPhotoButton = document.getElementById("scanPhotoButton");
-    //     const scanBarcodeButton = document.getElementById("scanBarcodeButton");
-    //     const scanBarcodeText = document.getElementById("scanBarcodeText");
-    //     var ctx = canvRefLoc.getContext('2d');
-    //     ctx.clearRect(0, 0, canvRefLoc.width, canvRefLoc.height);
-    //     // canvRefLoc.style.visibility = "visible";
-
-    //     webcam.play();
-    //     scanBarcodeText.innerText = "Use Barcode"
-    //     scanPhotoButton.style.visibility = "visible";
-    //     scanBarcodeButton.onclick = this.handleBarcodeScan;
-    //     ctx.clearRect(0, 0, canvRefLoc.width, canvRefLoc.height);
-    //     infoContent.innerText = "Keep a neutral face in the box";
-    //     this.drawRectangle();
-    // }
 
     handleBarcodeScan = async () => {
         const { scanningBarcode } = this.state;
@@ -448,7 +419,7 @@ class ScanningPage extends React.Component {
 
                         </div>
                         <div id="infoContainer">
-                            <p id="infoContent">Ensure that the face touches the box</p>
+                            <p id="infoContent">Ensure that the face fully occupies the box</p>
                         </div>
                         <select id="dropdownCamScan" onChange={this.handleVideoSourceChange}>
                             <option value="">Select Video Source</option>
@@ -617,11 +588,15 @@ class BigDeleteOverlay extends React.Component {
     render() {
         const { dataFromScanningPage } = this.props;
         console.log(dataFromScanningPage)
-        const [hours, minutes] = dataFromScanningPage.time.split(':');
-        let hour = parseInt(hours, 10);
-        const meridiem = hour >= 12 ? 'PM' : 'AM';
-        hour = hour % 12 || 12; // Convert 0 to 12 for 12-hour format
-        hour = hour + ':' + minutes + ' ' + meridiem;
+        let hour = "";
+        if (dataFromScanningPage.result !== "failed") {
+            const [hours, minutes] = dataFromScanningPage.time.split(':');
+            hour = parseInt(hours, 10);
+            const meridiem = hour >= 12 ? 'PM' : 'AM';
+            hour = hour % 12 || 12; // Convert 0 to 12 for 12-hour format
+            hour = hour + ':' + minutes + ' ' + meridiem;
+        }
+
         if (dataFromScanningPage.result !== "success") {
             return (
                 <div className="overlay">

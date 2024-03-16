@@ -7,7 +7,6 @@ import { Navigate } from "react-router-dom";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { toast } from 'react-toastify';
-// import moment from 'moment-timezone';
 
 
 class AddClass extends React.Component {
@@ -16,8 +15,8 @@ class AddClass extends React.Component {
         this.state = {
             isActive: false,
             back: false,
-            courseName: "", // Added state for course name
-            courseCode: "", // Added state for course code
+            courseName: "",
+            courseCode: "",
             classSection: "",
             selectedStartDate: null,
             startdatePickerOpen: false,
@@ -48,10 +47,9 @@ class AddClass extends React.Component {
         const { courseName, courseCode, classSection, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
         var errors = "";
         var isComplete = true;
-        // Perform your validation logic here
+
         if (courseName.trim().length === 0 || courseCode.trim().length === 0 || classSection.trim().length === 0 || !selectedStartDate || !selectedEndDate || !selectedStartTime || !selectedEndTime || selectedWeekdays.length === 0) {
             isComplete = false;
-            // Display an error message or take appropriate action
             if (courseName.trim().length === 0) {
                 errors += "<p>*Course Name is required</p>";
             }
@@ -72,10 +70,9 @@ class AddClass extends React.Component {
             if (!selectedStartTime || !selectedEndTime) {
                 errors += "<p>*Class Time is required</p>";
             }
-            // alert("Please fill in all the required fields and select at least one weekday.");
-            // return false;
+
         }
-        // console.log(new Date(selectedEndDate))
+
 
         if ((new Date(selectedStartDate) > new Date(selectedEndDate)) && selectedStartDate & selectedEndDate) {
             isComplete = false;
@@ -94,12 +91,7 @@ class AddClass extends React.Component {
 
             }
         }
-
         document.getElementById("addFormErrors").innerHTML = errors;
-
-
-        // Additional validation logic if needed
-
         return isComplete;
     };
 
@@ -112,23 +104,11 @@ class AddClass extends React.Component {
                 'thu': 4,
                 'fri': 5,
             };
-            // Proceed with adding the class logic here
             const { courseName, courseCode, classSection, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
             const selectedWeekdayNumbers = selectedWeekdays.map(weekday => weekdayNumberMap[weekday]);
-            // console.log(selectedWeekdayNumbers)
-
             const courseNSec = courseCode.concat(" ", classSection)
-            console.log(courseNSec)
-            // console.log(selectedStartDate, selectedEndDate)
-
             const Date1 = selectedStartDate.toDateString();
-            // const dateString1 = Date1.format(); // Convert date to ISO string format
-
             const Date2 = selectedEndDate.toDateString();
-            // const dateString2 = Date2.format(); // Convert date to ISO string format
-            console.log(Date1, Date2)
-
-
             const course = {
                 courseName: courseName,
                 courseCode: courseCode,
@@ -140,8 +120,6 @@ class AddClass extends React.Component {
                 courseStartTime: selectedStartTime,
                 courseEndTime: selectedEndTime,
             }
-
-
             fetch(
                 "http://localhost:3001/AddCourse",
                 {
@@ -167,8 +145,6 @@ class AddClass extends React.Component {
 
 
                 });
-        } else {
-            console.log("Hi");
         }
     };
 
@@ -190,7 +166,6 @@ class AddClass extends React.Component {
 
     handleStartDateChange = (date) => {
         this.setState({ selectedStartDate: date, startdatePickerOpen: false });
-        // You can perform any additional actions when the date is selected
     };
 
     toggleStartDatePicker = () => {
@@ -199,7 +174,6 @@ class AddClass extends React.Component {
 
     handleEndDateChange = (date) => {
         this.setState({ selectedEndDate: date, enddatePickerOpen: false });
-        // You can perform any additional actions when the date is selected
     };
 
     toggleEndDatePicker = () => {

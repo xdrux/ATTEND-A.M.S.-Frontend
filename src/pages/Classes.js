@@ -42,8 +42,6 @@ class Classes extends React.Component {
 
     handleClassClick = (clickedClass) => {
         console.log("Clicked class:", clickedClass);
-        // Add your logic here for handling the clicked class
-        // const selectedClass = { clickedClass };
         const isClicked = true;
         this.setState({ selectedClass: clickedClass, isClicked });
     };
@@ -75,7 +73,6 @@ class Classes extends React.Component {
         console.log(wrapper);
         document.getElementById("classList").innerHTML = wrapper;
 
-        // Add event listeners after setting innerHTML
         const clickableElements = document.getElementsByClassName("clickable");
         for (let i = 0; i < clickableElements.length; i++) {
             clickableElements[i].addEventListener("click", (event) => {
