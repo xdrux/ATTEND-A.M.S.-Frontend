@@ -54,14 +54,17 @@ class Classes extends React.Component {
 
         while (classCounter !== classes.length) {
             let currentClass = classes[classCounter];
-            divElement += `<p id="${currentClass}" class="clickable">${currentClass}</p> `;
+            divElement += `<div id="${currentClass}" class="clickable">`;
+            divElement += `<p>${currentClass}</p> `;
+            divElement += `<p class="acadYearText">2nd Semester 2023-2024</p>`
+            divElement += `</div>`;
 
             if (classCounter + 1 === classes.length) {
                 divElement += "</div>";
                 wrapper += divElement;
                 wrapper += "</div>";
             } else if ((classCounter + 1) % 3 === 0) {
-                console.log("huhu")
+                // console.log("huhu")
                 divElement += "</div>";
                 wrapper += divElement;
                 divElement = `<div class="classesBlock">`;

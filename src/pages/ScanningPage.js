@@ -208,7 +208,8 @@ class ScanningPage extends React.Component {
                                         studentNumber: attendanceData.studentNumber,
                                         time: attendanceData.timeIn,
                                         message: "",
-                                        courseNameSection: this.props.classId
+                                        courseNameSection: this.props.classId,
+                                        oldRecord: body.oldRecord
                                     }
                                 }, () => {
                                     // This callback will execute after the state has been updated
@@ -541,7 +542,9 @@ class BigDeleteOverlay extends React.Component {
         const studentData = {
             courseNameSection: dataFromScanningPage.courseNameSection,
             studentNumber: dataFromScanningPage.studentNumber,
-            dateToday: dateToday
+            dateToday: dateToday,
+            isPresent: dataFromScanningPage.oldRecord.isPresent,
+            timeIn: dataFromScanningPage.oldRecord.timeIn
         }
         this.props.onClose();
         fetch(

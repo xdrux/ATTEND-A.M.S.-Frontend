@@ -191,6 +191,7 @@ class AddStudent extends React.Component {
                                 id="firstName"
                                 value={firstName}
                                 onChange={this.handleFirstNameChange}
+                                placeholder="e.g. Juan"
                                 required
                             />
                             <p id='e-courseCode' className='S-Error'></p>
@@ -204,6 +205,7 @@ class AddStudent extends React.Component {
                                 id="lastName"
                                 value={lastName}
                                 onChange={this.handleLastNameChange}
+                                placeholder="e.g. Dela Cruz"
                                 required
                             />
                             <p id='e-courseSection' className='S-Error'></p>
@@ -300,7 +302,7 @@ class Overlay extends React.Component {
 
     // Start sampling process
     startSampling = () => {
-        var coundown = 10;
+        var coundown = 20;
         const countdownText = document.getElementById("samplingCountdown");
         const startButton = document.getElementById("startButton");
         startButton.style.display = "none";
@@ -311,9 +313,9 @@ class Overlay extends React.Component {
                 // Execute captureImage every 0.5 seconds for 5 seconds
                 const intervalId = setInterval(() => {
                     this.captureImage();
-                    countdownText.innerText = Math.round((coundown - 1) / 2) + " seconds...";
+                    countdownText.innerText = Math.round((coundown - 1) / 4) + " seconds...";
                     coundown--;
-                }, 500);
+                }, 250);
 
 
                 // Stop sampling process after 5 seconds

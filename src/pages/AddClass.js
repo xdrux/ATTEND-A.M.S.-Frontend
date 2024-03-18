@@ -7,6 +7,8 @@ import { Navigate } from "react-router-dom";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { toast } from 'react-toastify';
+import Dropdown from 'react-dropdown';
+// import 'react-dropdown/style.css'; // Import the CSS for react-dropdown
 
 
 class AddClass extends React.Component {
@@ -18,6 +20,9 @@ class AddClass extends React.Component {
             courseName: "",
             courseCode: "",
             classSection: "",
+            semester: "",
+            acadYear: "",
+            type: this.options[0],
             selectedStartDate: null,
             startdatePickerOpen: false,
             selectedEndDate: null,
@@ -44,11 +49,12 @@ class AddClass extends React.Component {
 
 
     validateForm = () => {
-        const { courseName, courseCode, classSection, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
+        const { courseName, courseCode, classSection, semester, acadYear, type, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
+        console.log(semester, acadYear, type)
         var errors = "";
         var isComplete = true;
 
-        if (courseName.trim().length === 0 || courseCode.trim().length === 0 || classSection.trim().length === 0 || !selectedStartDate || !selectedEndDate || !selectedStartTime || !selectedEndTime || selectedWeekdays.length === 0) {
+        if (courseName.trim().length === 0 || courseCode.trim().length === 0 || classSection.trim().length === 0 || semester.trim().length === 0 || acadYear.trim().length === 0 || type.trim().length === 0 || !selectedStartDate || !selectedEndDate || !selectedStartTime || !selectedEndTime || selectedWeekdays.length === 0) {
             isComplete = false;
             if (courseName.trim().length === 0) {
                 errors += "<p>*Course Name is required</p>";
@@ -59,6 +65,15 @@ class AddClass extends React.Component {
 
             if (classSection.trim().length === 0) {
                 errors += "<p>*Course Section is required</p>";
+            }
+            if (semester.trim().length === 0) {
+                errors += "<p>*Semester is required</p>";
+            }
+            if (acadYear.trim().length === 0) {
+                errors += "<p>*Academic Year is required</p>";
+            }
+            if (type.trim().length === 0) {
+                errors += "<p>*Type is required</p>";
             }
 
             if (selectedWeekdays.length === 0) {
@@ -104,9 +119,11 @@ class AddClass extends React.Component {
                 'thu': 4,
                 'fri': 5,
             };
-            const { courseName, courseCode, classSection, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
+            const { courseName, courseCode, classSection, semester, acadYear, type, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
             const selectedWeekdayNumbers = selectedWeekdays.map(weekday => weekdayNumberMap[weekday]);
-            const courseNSec = courseCode.concat(" ", classSection)
+            let courseNSec = courseCode.concat(" ", classSection)
+            courseNSec = courseNSec.concat(" ", semester)
+            courseNSec = courseNSec.concat(" ", acadYear)
             const Date1 = selectedStartDate.toDateString();
             const Date2 = selectedEndDate.toDateString();
             const course = {
@@ -114,6 +131,9 @@ class AddClass extends React.Component {
                 courseCode: courseCode,
                 courseSection: classSection,
                 courseNameSection: courseNSec,
+                semester: semester,
+                acadYear: acadYear,
+                type: type,
                 courseSchedule: selectedWeekdayNumbers,
                 courseStartDate: Date1,
                 courseEndDate: Date2,
@@ -159,9 +179,20 @@ class AddClass extends React.Component {
     handleCourseCodeChange = (event) => {
         this.setState({ courseCode: event.target.value });
     };
+    handleSemesterChange = (event) => {
+        this.setState({ semester: event.target.value });
+    };
+    handleAcadYearChange = (event) => {
+        this.setState({ acadYear: event.target.value });
+    };
 
     handleClassSectionChange = (event) => {
         this.setState({ classSection: event.target.value });
+    };
+
+    handleTypeChange = selectedOption => {
+        this.setState({ type: selectedOption });
+        console.log(selectedOption.label)
     };
 
     handleStartDateChange = (date) => {
@@ -181,7 +212,12 @@ class AddClass extends React.Component {
     };
 
     handleStartTimeChange = (event) => {
-        this.setState({ selectedStartTime: event.target.value });
+        const [hours, minutes] = event.target.value.split(':');
+        let hour = parseInt(hours, 10);
+        const meridiem = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12; // Convert 0 to 12 for 12-hour format
+        hour = hour + ':' + minutes + ' ' + meridiem;
+        this.setState({ selectedStartTime: hour });
     };
 
     handleStartTimeBlur = () => {
@@ -195,8 +231,17 @@ class AddClass extends React.Component {
     };
 
     handleEndTimeChange = (event) => {
-        this.setState({ selectedEndTime: event.target.value });
+        const [hours, minutes] = event.target.value.split(':');
+        let hour = parseInt(hours, 10);
+        const meridiem = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12; // Convert 0 to 12 for 12-hour format
+        hour = hour + ':' + minutes + ' ' + meridiem;
+        this.setState({ selectedEndTime: hour });
     };
+
+    options = [
+        'Lec', 'Lab', 'Recit'
+    ];
 
     handleEndTimeBlur = () => {
         if (this.state.selectedEndTime) {
@@ -217,7 +262,7 @@ class AddClass extends React.Component {
     };
 
     render() {
-        const { courseName, courseCode, classSection, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays, goHome } = this.state;
+        const { courseName, courseCode, classSection, semester, acadYear, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays, goHome } = this.state;
         if (goHome) {
             return <Navigate to="/" />;
         }
@@ -235,9 +280,9 @@ class AddClass extends React.Component {
                             <p className="addButtonText">Add</p>
                         </div>
                     </div>
-                    <form className="formBlock">
+                    <form className="formBlock" id="formBlockClass">
                         <div className="formItem">
-                            <label className="FormLabel" htmlFor="courseName">Course Name</label>
+                            <label className="FormLabel" htmlFor="courseName">Course Title</label>
                             <input
                                 type="text"
                                 name="courseName"
@@ -245,6 +290,7 @@ class AddClass extends React.Component {
                                 id="courseName"
                                 value={courseName}
                                 onChange={this.handleCourseNameChange}
+                                placeholder="e.g. Introduction to Computer Science"
                                 required
                             />
                         </div>
@@ -257,6 +303,7 @@ class AddClass extends React.Component {
                                 id="courseCode"
                                 value={courseCode}
                                 onChange={this.handleCourseCodeChange}
+                                placeholder="e.g. CMSC 12"
                                 required
                             />
                             <p id='e-courseCode' className='S-Error'></p>
@@ -270,9 +317,56 @@ class AddClass extends React.Component {
                                 id="classSection"
                                 value={classSection}
                                 onChange={this.handleClassSectionChange}
+                                placeholder="e.g. T"
                                 required
                             />
                             <p id='e-courseSection' className='S-Error'></p>
+                        </div>
+                        <div className="formItem">
+                            <label className="FormLabel" htmlFor="semester">Semester and Year</label>
+                            <div className="semYear">
+                                <input
+                                    type="text"
+                                    name="semester"
+                                    className="FormTextArea"
+                                    id="semester"
+                                    value={semester}
+                                    onChange={this.handleSemesterChange}
+                                    placeholder="e.g. 2nd Semester"
+                                    required
+                                />
+                                <input
+                                    type="text"
+                                    name="acadYear"
+                                    className="FormTextArea"
+                                    id="acadYear"
+                                    value={acadYear}
+                                    onChange={this.handleAcadYearChange}
+                                    placeholder="e.g. 2023-2024"
+                                    required
+                                />
+                            </div>
+
+                            <p id='e-courseCode' className='S-Error'></p>
+                        </div>
+                        {/* <div className="formItem">
+                            <label className="FormLabel" htmlFor="acadYear">Academic Year</label>
+                            <input
+                                type="text"
+                                name="acadYear"
+                                className="FormTextArea"
+                                id="acadYear"
+                                value={acadYear}
+                                onChange={this.handleAcadYearChange}
+                                required
+                            />
+                            <p id='e-courseCode' className='S-Error'></p>
+                        </div> */}
+                        <div className="formItem">
+                            <p className="FormLabel">Type</p>
+                            <Dropdown className="custom-dropdown"
+                                controlClassName="custom-dropdown-control"
+                                menuClassName="custom-dropdown-option" options={this.options} onChange={this.handleTypeChange} value={this.options[0]} placeholder="Select an option" />
                         </div>
                         <div className="formItem">
                             <p className="FormLabel">Class Schedule</p>
