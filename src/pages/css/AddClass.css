@@ -201,7 +201,7 @@ input[type="checkbox"] {
     position: absolute;
     top: 100%;
     width: 100%; */
-    z-index: 1000;
+    /* z-index: 1; */
     -webkit-overflow-scrolling: touch;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     text-align: center;
@@ -228,7 +228,7 @@ input[type="checkbox"] {
 
 .Dropdown-root {
     position: fixed;
-    z-index: 99999;
+    z-index: 1;
     margin-left: 30vw;
     width: 30vw;
     border-radius: 10px;
@@ -268,4 +268,9 @@ input[type="checkbox"] {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
+}
+
+.react-datepicker__month-container {
+    position: static;
+    z-index: 9999999;
 }

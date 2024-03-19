@@ -168,3 +168,9 @@ p {
 .acadYearText {
     font-size: 3vh;
 }
+
+.rosterBelowHeader {
+    font-size: 2vh;
+    text-align: center;
+    margin-top: -1vh;
+}

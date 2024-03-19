@@ -54,7 +54,7 @@ class AddClass extends React.Component {
         var errors = "";
         var isComplete = true;
 
-        if (courseName.trim().length === 0 || courseCode.trim().length === 0 || classSection.trim().length === 0 || semester.trim().length === 0 || acadYear.trim().length === 0 || type.trim().length === 0 || !selectedStartDate || !selectedEndDate || !selectedStartTime || !selectedEndTime || selectedWeekdays.length === 0) {
+        if (courseName.trim().length === 0 || courseCode.trim().length === 0 || classSection.trim().length === 0 || semester.trim().length === 0 || acadYear.trim().length === 0 || !selectedStartDate || !selectedEndDate || !selectedStartTime || !selectedEndTime || selectedWeekdays.length === 0) {
             isComplete = false;
             if (courseName.trim().length === 0) {
                 errors += "<p>*Course Name is required</p>";
@@ -121,9 +121,9 @@ class AddClass extends React.Component {
             };
             const { courseName, courseCode, classSection, semester, acadYear, type, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
             const selectedWeekdayNumbers = selectedWeekdays.map(weekday => weekdayNumberMap[weekday]);
-            let courseNSec = courseCode.concat(" ", classSection)
-            courseNSec = courseNSec.concat(" ", semester)
-            courseNSec = courseNSec.concat(" ", acadYear)
+            const courseNSec = courseCode.concat(" ", classSection)
+            let courseYear = courseNSec.concat(" ", semester)
+            courseYear = courseYear.concat(" ", acadYear)
             const Date1 = selectedStartDate.toDateString();
             const Date2 = selectedEndDate.toDateString();
             const course = {
@@ -133,13 +133,15 @@ class AddClass extends React.Component {
                 courseNameSection: courseNSec,
                 semester: semester,
                 acadYear: acadYear,
-                type: type,
+                courseYear: courseYear,
+                type: type.value,
                 courseSchedule: selectedWeekdayNumbers,
                 courseStartDate: Date1,
                 courseEndDate: Date2,
                 courseStartTime: selectedStartTime,
                 courseEndTime: selectedEndTime,
             }
+            console.log(course)
             fetch(
                 "http://localhost:3001/AddCourse",
                 {

@@ -12,6 +12,8 @@ class Classes extends React.Component {
             isActive: false,
             back: false,
             classes: [],
+            semester: [],
+            acadYear: [],
             selectedClass: null
         };
     }
@@ -25,7 +27,7 @@ class Classes extends React.Component {
             .then(response => response.json())
             .then(body => {
                 console.log(body)
-                this.setState({ classes: body });
+                this.setState({ classes: body.classes, semester: body.semester, acadYear: body.acadYear });
                 this.createClasses();
             });
 
@@ -47,16 +49,18 @@ class Classes extends React.Component {
     };
 
     createClasses() {
-        const { classes } = this.state;
+        const { classes, semester, acadYear } = this.state;
         var classCounter = 0;
         var divElement = `<div class="classesBlock">`;
         var wrapper = `<div class= "classMainBlock">`;
 
         while (classCounter !== classes.length) {
             let currentClass = classes[classCounter];
-            divElement += `<div id="${currentClass}" class="clickable">`;
+            let sem = semester[classCounter];
+            let year = acadYear[classCounter];
+            divElement += `<div id="${currentClass} ${sem} ${year}" class="clickable">`;
             divElement += `<p>${currentClass}</p> `;
-            divElement += `<p class="acadYearText">2nd Semester 2023-2024</p>`
+            divElement += `<p class="acadYearText">${sem} ${year}</p>`;
             divElement += `</div>`;
 
             if (classCounter + 1 === classes.length) {
@@ -78,8 +82,9 @@ class Classes extends React.Component {
 
         const clickableElements = document.getElementsByClassName("clickable");
         for (let i = 0; i < clickableElements.length; i++) {
+            console.log(i)
             clickableElements[i].addEventListener("click", (event) => {
-                this.handleClassClick(event.target.id);
+                this.handleClassClick(clickableElements[i].id);
             });
         }
     }

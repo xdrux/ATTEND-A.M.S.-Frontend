@@ -20,6 +20,7 @@ class ClassRoster extends React.Component {
             isAddStudentClicked: false,
             isDeleteAllClicked: false,
             action: "",
+            classInfo: {},
             students: [],
             folderNames: null,
             faceSamples: null,
@@ -35,8 +36,23 @@ class ClassRoster extends React.Component {
                 this.setState({ isActive: true });
             }, 100); // Adjust the delay time as needed
             const section = {
-                courseNameSection: this.props.classId
+                courseYear: this.props.classId
             }
+
+            fetch(
+                "http://localhost:3001/getClassInfo",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(section)
+                }).then(response => response.json())
+                .then(body => {
+                    this.setState({ classInfo: body });
+                    this.setState({ loading: false });
+                });
+
             fetch(
                 "http://localhost:3001/getStudentsName",
                 {
@@ -70,7 +86,7 @@ class ClassRoster extends React.Component {
         console.log(student);
 
         const body = {
-            courseNameSection: this.props.classId,
+            courseYear: this.props.classId,
             fullName: student
         }
 
@@ -153,7 +169,7 @@ class ClassRoster extends React.Component {
 
         if (data === "whole") {
             const section = {
-                courseNameSection: this.props.classId
+                courseYear: this.props.classId
             }
             fetch(
                 "http://localhost:3001/deleteCourse",
@@ -180,7 +196,7 @@ class ClassRoster extends React.Component {
 
         } else if (data === "students") {
             const section = {
-                courseNameSection: this.props.classId
+                courseYear: this.props.classId
             }
             fetch(
                 "http://localhost:3001/deleteAllStudents",
@@ -210,7 +226,7 @@ class ClassRoster extends React.Component {
     };
 
     render() {
-        const { isAddStudentClicked, students, isDeleteAllClicked, loading } = this.state;
+        const { isAddStudentClicked, students, isDeleteAllClicked, loading, classInfo } = this.state;
         const loadingColor = 'rgb(123, 17, 19)';
 
         if (isAddStudentClicked) {
@@ -233,7 +249,10 @@ class ClassRoster extends React.Component {
                             {this.state.back ? (<Navigate to="/Register/MyClasses" />) :
                                 (<img onClick={this.handleBackClick} className="BackIcon" src={backIcon} alt="back" />)
                             }
-                            <p className="HeaderText">{this.props.classId}</p>
+                            <div className="HeaderText">
+                                <p>{classInfo.courseNameSection}</p>
+                                <p className="rosterBelowHeader">{classInfo.semester} {classInfo.acadYear}</p>
+                            </div>
 
                             <div className="addStudentButton" onClick={this.handleAddStudentClick}>
                                 <p className="addButtonText">Add Student</p>

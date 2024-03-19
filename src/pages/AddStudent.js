@@ -111,7 +111,7 @@ class AddStudent extends React.Component {
                 lastName: lastName,
                 middleName: middleName,
                 faceSamples: faceSamples,
-                courseNameSection: this.props.classId
+                courseYear: this.props.classId
             }
             fetch(
                 "http://localhost:3001/AddStudent",
