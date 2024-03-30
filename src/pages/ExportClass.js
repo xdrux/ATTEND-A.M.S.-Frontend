@@ -14,6 +14,7 @@ class ExportClass extends React.Component {
             isActive: false,
             back: false,
             classes: [],
+            classInfo: [],
             selectedClass: null,
             loading: false
         };
@@ -29,8 +30,37 @@ class ExportClass extends React.Component {
             .then(body => {
                 console.log(body)
                 this.setState({ classes: body.h5_files }, () => {
-                    this.createClasses();
+                    // Iterate over each class and fetch additional information
+                    this.state.classes.forEach(courseYear => {
+                        const section = {
+                            courseYear: courseYear
+                        };
+
+                        fetch("http://localhost:3001/getClassInfo", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(section)
+                        })
+                            .then(response => response.json())
+                            .then(body => {
+                                console.log(body);
+                                // Save the response to classInfo state
+                                this.setState(prevState => ({
+                                    classInfo: [...prevState.classInfo, body]
+                                }), () => {
+                                    this.createClasses();
+                                });
+                            })
+                            .catch(error => {
+                                console.error("Error fetching class info:", error);
+                            });
+                    });
                 });
+            })
+            .catch(error => {
+                console.error("Error fetching available classes:", error);
             });
 
 
@@ -69,7 +99,7 @@ class ExportClass extends React.Component {
         this.setState({ loading: true });
         console.log("Clicked class:", clickedClass);
         const section = {
-            courseNameSection: clickedClass
+            courseYear: clickedClass
         }
         fetch(
             "http://localhost:3001/getClassStudents",
@@ -200,21 +230,27 @@ class ExportClass extends React.Component {
     };
 
     createClasses() {
-        const { classes } = this.state;
+        const { classes, classInfo } = this.state;
+        console.log(classInfo)
         var classCounter = 0;
         var divElement = `<div class="classesBlock">`;
         var wrapper = `<div class= "classMainBlock">`;
 
         while (classCounter !== classes.length) {
-            let currentClass = classes[classCounter];
-            divElement += `<p id="${currentClass}" class="clickable">${currentClass}</p> `;
+            let currentClass = classInfo[classCounter].courseNameSection;
+            let sem = classInfo[classCounter].semester;
+            let year = classInfo[classCounter].acadYear;
+            divElement += `<div id="${currentClass} ${sem} ${year}" class="clickable">`;
+            divElement += `<p>${currentClass}</p> `;
+            divElement += `<p class="acadYearText">${sem} ${year}</p>`;
+            divElement += `</div>`;
 
             if (classCounter + 1 === classes.length) {
                 divElement += "</div>";
                 wrapper += divElement;
                 wrapper += "</div>";
             } else if ((classCounter + 1) % 3 === 0) {
-                console.log("huhu")
+                // console.log("huhu")
                 divElement += "</div>";
                 wrapper += divElement;
                 divElement = `<div class="classesBlock">`;
@@ -228,10 +264,12 @@ class ExportClass extends React.Component {
 
         const clickableElements = document.getElementsByClassName("clickable");
         for (let i = 0; i < clickableElements.length; i++) {
+            console.log(i)
             clickableElements[i].addEventListener("click", (event) => {
-                this.handleClassClick(event.target.id);
+                this.handleClassClick(clickableElements[i].id);
             });
         }
+
     }
 
     render() {

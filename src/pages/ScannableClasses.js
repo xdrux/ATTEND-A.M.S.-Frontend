@@ -12,6 +12,7 @@ class ScannableClasses extends React.Component {
             isActive: false,
             back: false,
             classes: [],
+            classInfo: [],
             selectedClass: null
         };
     }
@@ -21,13 +22,43 @@ class ScannableClasses extends React.Component {
             this.setState({ isActive: true });
         }, 100);
 
+
         fetch("http://127.0.0.1:4000/getAvailableClasses")
             .then(response => response.json())
             .then(body => {
                 console.log(body)
                 this.setState({ classes: body.h5_files }, () => {
-                    this.createClasses();
+                    // Iterate over each class and fetch additional information
+                    this.state.classes.forEach(courseYear => {
+                        const section = {
+                            courseYear: courseYear
+                        };
+
+                        fetch("http://localhost:3001/getClassInfo", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(section)
+                        })
+                            .then(response => response.json())
+                            .then(body => {
+                                console.log(body);
+                                // Save the response to classInfo state
+                                this.setState(prevState => ({
+                                    classInfo: [...prevState.classInfo, body]
+                                }), () => {
+                                    this.createClasses();
+                                });
+                            })
+                            .catch(error => {
+                                console.error("Error fetching class info:", error);
+                            });
+                    });
                 });
+            })
+            .catch(error => {
+                console.error("Error fetching available classes:", error);
             });
 
 
@@ -48,21 +79,27 @@ class ScannableClasses extends React.Component {
     };
 
     createClasses() {
-        const { classes } = this.state;
+        const { classes, classInfo } = this.state;
+        console.log(classInfo)
         var classCounter = 0;
         var divElement = `<div class="classesBlock">`;
         var wrapper = `<div class= "classMainBlock">`;
 
         while (classCounter !== classes.length) {
-            let currentClass = classes[classCounter];
-            divElement += `<p id="${currentClass}" class="clickable">${currentClass}</p> `;
+            let currentClass = classInfo[classCounter].courseNameSection;
+            let sem = classInfo[classCounter].semester;
+            let year = classInfo[classCounter].acadYear;
+            divElement += `<div id="${currentClass} ${sem} ${year}" class="clickable">`;
+            divElement += `<p>${currentClass}</p> `;
+            divElement += `<p class="acadYearText">${sem} ${year}</p>`;
+            divElement += `</div>`;
 
             if (classCounter + 1 === classes.length) {
                 divElement += "</div>";
                 wrapper += divElement;
                 wrapper += "</div>";
             } else if ((classCounter + 1) % 3 === 0) {
-                console.log("huhu")
+                // console.log("huhu")
                 divElement += "</div>";
                 wrapper += divElement;
                 divElement = `<div class="classesBlock">`;
@@ -76,10 +113,54 @@ class ScannableClasses extends React.Component {
 
         const clickableElements = document.getElementsByClassName("clickable");
         for (let i = 0; i < clickableElements.length; i++) {
+            console.log(i)
             clickableElements[i].addEventListener("click", (event) => {
-                this.handleClassClick(event.target.id);
+                this.handleClassClick(clickableElements[i].id);
             });
         }
+
+        // const { classes } = this.state;
+        // var classCounter = 0;
+        // var divElement = `<div class="classesBlock">`;
+        // var wrapper = `<div class= "classMainBlock">`;
+
+        // while (classCounter !== classes.length) {
+        //     let currentClass = classes[classCounter];
+
+        //     const section = {
+        //         courseYear: classes[classCounter]
+        //     }
+
+
+
+        //     // divElement += `<div id="${currentClass} ${sem} ${year}" class="clickable">`;
+        //     // divElement += `<p>${currentClass}</p> `;
+        //     // divElement += `<p class="acadYearText">${sem} ${year}</p>`;
+        //     // divElement += `</div>`;
+
+        //     // if (classCounter + 1 === classes.length) {
+        //     //     divElement += "</div>";
+        //     //     wrapper += divElement;
+        //     //     wrapper += "</div>";
+        //     // } else if ((classCounter + 1) % 3 === 0) {
+        //     //     // console.log("huhu")
+        //     //     divElement += "</div>";
+        //     //     wrapper += divElement;
+        //     //     divElement = `<div class="classesBlock">`;
+        //     // }
+
+        //     // classCounter++;
+        // }
+
+        // console.log(wrapper);
+        // document.getElementById("classList").innerHTML = wrapper;
+
+        // const clickableElements = document.getElementsByClassName("clickable");
+        // for (let i = 0; i < clickableElements.length; i++) {
+        //     clickableElements[i].addEventListener("click", (event) => {
+        //         this.handleClassClick(event.target.id);
+        //     });
+        // }
     }
 
     render() {

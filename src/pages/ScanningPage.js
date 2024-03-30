@@ -31,6 +31,7 @@ class ScanningPage extends React.Component {
             back: false,
             isAddStudentClicked: false,
             action: "",
+            classInfo: {},
             students: [],
             folderNames: null,
             faceSamples: null,
@@ -47,7 +48,7 @@ class ScanningPage extends React.Component {
                 studentNumber: "",
                 time: "",
                 message: "",
-                courseNameSection: ""
+                courseYear: ""
             },
             loading: false
         };
@@ -58,6 +59,22 @@ class ScanningPage extends React.Component {
         this.timeout = setTimeout(() => {
             this.setState({ isActive: true });
         }, 100); // Adjust the delay time as needed
+        const section = {
+            courseYear: this.props.classId
+        }
+
+        fetch(
+            "http://localhost:3001/getClassInfo",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(section)
+            }).then(response => response.json())
+            .then(body => {
+                this.setState({ classInfo: body });
+            });
 
         this.getVideoSources(); // Fetch available video sources when component mounts
         this.drawRectangle();
@@ -184,7 +201,7 @@ class ScanningPage extends React.Component {
                         studentNumber: data.predicted_face,
                         dateToday: formattedDateString,
                         timeIn: currentTime,
-                        courseNameSection: this.props.classId
+                        courseYear: this.props.classId
                     }
 
                     console.log(attendanceData);
@@ -208,7 +225,7 @@ class ScanningPage extends React.Component {
                                         studentNumber: attendanceData.studentNumber,
                                         time: attendanceData.timeIn,
                                         message: "",
-                                        courseNameSection: this.props.classId,
+                                        courseYear: this.props.classId,
                                         oldRecord: body.oldRecord
                                     }
                                 }, () => {
@@ -311,7 +328,7 @@ class ScanningPage extends React.Component {
                             studentNumber: studNum,
                             dateToday: formattedDateString,
                             timeIn: currentTime,
-                            courseNameSection: this.props.classId
+                            courseYear: this.props.classId
                         }
 
                         console.log(attendanceData);
@@ -335,7 +352,7 @@ class ScanningPage extends React.Component {
                                             studentNumber: attendanceData.studentNumber,
                                             time: attendanceData.timeIn,
                                             message: "",
-                                            courseNameSection: this.props.classId
+                                            courseYear: this.props.classId
                                         }
                                     }, () => {
                                         // This callback will execute after the state has been updated
@@ -400,7 +417,7 @@ class ScanningPage extends React.Component {
 
 
     render() {
-        const { openOverlay, dataForOverlay, loading } = this.state;
+        const { openOverlay, dataForOverlay, classInfo, loading } = this.state;
         const loadingColor = 'rgb(123, 17, 19)';
         return (
             <div>
@@ -416,8 +433,10 @@ class ScanningPage extends React.Component {
                             {this.state.back ? (<Navigate to="/Scan" />) :
                                 (<img onClick={this.handleBackClick} className="BackIcon" src={backIcon} alt="back" />)
                             }
-                            <p className="HeaderText">{this.props.classId}</p>
-
+                            <div className="HeaderText">
+                                <p>{classInfo.courseNameSection}</p>
+                                <p className="rosterBelowHeader">{classInfo.semester} {classInfo.acadYear}</p>
+                            </div>
                         </div>
                         <div id="infoContainer">
                             <p id="infoContent">Ensure that the face fully occupies the box</p>
@@ -540,7 +559,7 @@ class BigDeleteOverlay extends React.Component {
         const dateToday = dateNow.toDateString();
         const { dataFromScanningPage } = this.props;
         const studentData = {
-            courseNameSection: dataFromScanningPage.courseNameSection,
+            courseYear: dataFromScanningPage.courseYear,
             studentNumber: dataFromScanningPage.studentNumber,
             dateToday: dateToday,
             isPresent: dataFromScanningPage.oldRecord.isPresent,

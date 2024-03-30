@@ -124,7 +124,7 @@ class ClassRoster extends React.Component {
 
     handleDownloadDataClick = () => {
         const section = {
-            courseNameSection: this.props.classId
+            courseYear: this.props.classId
         }
 
         fetch(
