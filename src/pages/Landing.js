@@ -2,6 +2,9 @@ import React from "react";
 import './css/common.css';
 import './css/Landing.css';
 import logo from './../assets/landingLogo.png';
+import profile from './../assets/profile.png';
+import exit from './../assets/exit.png';
+import Cookies from "universal-cookie";
 import { Navigate } from "react-router-dom";
 
 class Landing extends React.Component {
@@ -55,6 +58,16 @@ class Landing extends React.Component {
         this.setState({ redirectToExport: true });
     };
 
+    logOut = () => {
+        const cookies = new Cookies();
+        cookies.remove("authToken");
+
+        // Delete username in local storage
+        localStorage.removeItem("useremail");
+
+        this.setState({ isLoggedIn: false });
+    }
+
     render() {
         const { isLoggedIn } = this.state;
 
@@ -66,6 +79,14 @@ class Landing extends React.Component {
                 <div className={`fade-in ${this.state.isActive ? 'active' : ''}`}>
                     <div className="LandingLogo">
                         <img id='landing-logo' src={logo} alt="logo" />
+                    </div>
+                    <div id="profileContainer">
+                        <img className="landing-headerImages" src={profile} alt="profile" />
+                        <p className="headerText">{localStorage.getItem("useremail")}</p>
+                    </div>
+                    <div id="logoutContainer" onClick={this.logOut}>
+                        <img className="landing-headerImages" src={exit} alt="logout" />
+                        <p className="headerText">Log out</p>
                     </div>
                     <div className="LandingButtonsBlock">
                         {this.state.redirectToRegister ? (<Navigate to="/Register" />) :

@@ -50,3 +50,35 @@
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-size: 4vh;
 }
+
+#logoutContainer {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 2vh;
+    right: 1vw;
+    cursor: pointer;
+    z-index: 999999;
+}
+
+.landing-headerImages {
+    height: 6vh;
+}
+
+.headerText {
+    font-size: 3vh;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: rgb(123, 17, 19);
+}
+
+#profileContainer {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 2vh;
+    left: 1vw;
+    cursor: pointer;
+    z-index: 999999;
+}

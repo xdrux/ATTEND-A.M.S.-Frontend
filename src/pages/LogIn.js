@@ -73,8 +73,11 @@ class LogIn extends React.Component {
                 .then(response => response.json())
                 .then(body => {
                     console.log(body)
-                    if (!body.success) { alert("Failed to log in"); }
+                    if (!body.success) {
+                        document.getElementById("incorrectEmailPass").style.visibility = "visible";
+                    }
                     else {
+                        document.getElementById("incorrectEmailPass").style.visibility = "hidden";
                         // successful log in. store the token as a cookie
 
                         const cookies = new Cookies();
@@ -88,8 +91,8 @@ class LogIn extends React.Component {
                             });
 
                         localStorage.setItem("useremail", body.useremail);
-                        alert("Successfully logged in");
-                        this.setState({ isValidCred: true });
+                        // alert("Successfully logged in");
+                        this.setState({ isLoggedIn: true });
 
 
                     }
@@ -110,6 +113,9 @@ class LogIn extends React.Component {
                         <img id='landing-logo' src={logo} alt="logo" />
                     </div>
                     <div className="accountFormContainer">
+                        <div id="incorrectEmailPass">
+                            <p>Incorrect email or password</p>
+                        </div>
                         <form id='l-myForm' className="accountFormL">
                             <p className="authHeader">Login</p>
                             <div className='L-Field'>
