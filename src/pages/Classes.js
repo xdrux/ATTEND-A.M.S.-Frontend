@@ -10,6 +10,7 @@ class Classes extends React.Component {
         super(props);
         this.state = {
             isActive: false,
+            isLoggedIn: true,
             back: false,
             classes: [],
             semester: [],
@@ -18,21 +19,39 @@ class Classes extends React.Component {
         };
     }
 
-    componentDidMount() {
+    componentDidMount = async () => {
+        // Set isActive after a delay for the fade-in effect
         this.timeout = setTimeout(() => {
             this.setState({ isActive: true });
         }, 100);
 
-        fetch("http://localhost:3001/getClasses")
-            .then(response => response.json())
-            .then(body => {
-                console.log(body)
-                this.setState({ classes: body.classes, semester: body.semester, acadYear: body.acadYear });
-                this.createClasses();
+        try {
+            // Make the first fetch and wait for response
+            const loggedInResponse = await fetch("http://localhost:3001/checkIfLoggedIn", {
+                method: "POST",
+                credentials: "include",
             });
+            const loggedInBody = await loggedInResponse.json();
+            console.log(loggedInBody)
+            // Update state based on login status
+            if (loggedInBody.isLoggedIn) {
+                this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
+            } else {
+                this.setState({ isLoggedIn: false });
+            }
 
+            // Now that login status is confirmed, make the second fetch
+            const classesResponse = await fetch("http://localhost:3001/getClasses");
+            const classesBody = await classesResponse.json();
 
-    }
+            this.setState({ classes: classesBody.classes, semester: classesBody.semester, acadYear: classesBody.acadYear });
+            this.createClasses();
+        } catch (error) {
+            console.error(error);
+            // Handle errors appropriately, e.g., display an error message
+        }
+    };
+
 
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -90,12 +109,16 @@ class Classes extends React.Component {
     }
 
     render() {
-        const { isClicked, selectedClass } = this.state;
+        const { isLoggedIn, isClicked, selectedClass } = this.state;
 
         if (isClicked) {
             const url = `/Register/MyClasses/ClassRoster/${selectedClass}`;
             console.log(url);
             return <Navigate to={url} replace />;
+        }
+
+        if (isLoggedIn === false) {
+            return <Navigate to="/login" />
         }
         return (
             <div className="Bg">

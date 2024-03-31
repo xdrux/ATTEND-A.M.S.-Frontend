@@ -10,6 +10,7 @@ class RegisterOptions extends React.Component {
         super(props);
         this.state = {
             isActive: false,
+            isLoggedIn: true,
             back: false,
             addClass: false,
             myClasses: false
@@ -21,6 +22,20 @@ class RegisterOptions extends React.Component {
         this.timeout = setTimeout(() => {
             this.setState({ isActive: true });
         }, 100); // Adjust the delay time as needed
+        fetch("http://localhost:3001/checkIfLoggedIn",
+            {
+                method: "POST",
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(body => {
+                console.log(body)
+                if (body.isLoggedIn) {
+                    this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
+                } else {
+                    this.setState({ isLoggedIn: false });
+                }
+            });
     }
 
     componentWillUnmount() {
@@ -41,6 +56,10 @@ class RegisterOptions extends React.Component {
 
 
     render() {
+        const { isLoggedIn } = this.state;
+        if (isLoggedIn === false) {
+            return <Navigate to="/login" />
+        }
         return (
             <div className="Bg">
                 <div className={`fade-in ${this.state.isActive ? 'active' : ''}`}>

@@ -3,13 +3,14 @@ import './css/common.css';
 import './css/Landing.css';
 import logo from './../assets/landingLogo.png';
 import Cookies from "universal-cookie";
-// import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 class LogIn extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             isActive: false,
+            isLoggedIn: false,
             email: "",
             password: ""
         };
@@ -20,6 +21,20 @@ class LogIn extends React.Component {
         this.timeout = setTimeout(() => {
             this.setState({ isActive: true });
         }, 100); // Adjust the delay time as needed
+        fetch("http://localhost:3001/checkIfLoggedIn",
+            {
+                method: "POST",
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(body => {
+                console.log(body)
+                if (body.isLoggedIn) {
+                    this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
+                } else {
+                    this.setState({ isLoggedIn: false });
+                }
+            });
     }
 
     componentWillUnmount() {
@@ -84,7 +99,10 @@ class LogIn extends React.Component {
 
 
     render() {
-        const { email, password } = this.state;
+        const { isLoggedIn, email, password } = this.state;
+        if (isLoggedIn === true) {
+            return <Navigate to="/" />
+        }
         return (
             <div className="Bg">
                 <div className={`fade-in ${this.state.isActive ? 'active' : ''}`}>

@@ -28,6 +28,7 @@ class ScanningPage extends React.Component {
         this.codeReader = new BrowserBarcodeReader();
         this.state = {
             isActive: false,
+            isLoggedIn: true,
             back: false,
             isAddStudentClicked: false,
             action: "",
@@ -59,6 +60,21 @@ class ScanningPage extends React.Component {
         this.timeout = setTimeout(() => {
             this.setState({ isActive: true });
         }, 100); // Adjust the delay time as needed
+        fetch("http://localhost:3001/checkIfLoggedIn",
+            {
+                method: "POST",
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(body => {
+                console.log(body)
+                if (body.isLoggedIn) {
+                    this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
+                } else {
+                    this.setState({ isLoggedIn: false });
+                }
+            });
+
         const section = {
             courseYear: this.props.classId
         }
@@ -417,8 +433,12 @@ class ScanningPage extends React.Component {
 
 
     render() {
-        const { openOverlay, dataForOverlay, classInfo, loading } = this.state;
+        const { isLoggedIn, openOverlay, dataForOverlay, classInfo, loading } = this.state;
         const loadingColor = 'rgb(123, 17, 19)';
+
+        if (isLoggedIn === false) {
+            return <Navigate to="/login" />
+        }
         return (
             <div>
                 {loading && (

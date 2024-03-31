@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-// import Landing from "./pages/Landing";
+import Landing from "./pages/Landing";
 import LogIn from "./pages/LogIn";
 import SignUp from "./pages/SignUp";
 import RegisterOptions from "./pages/RegisterOptions";
@@ -19,7 +19,8 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route exact={true} path="/" element={<LogIn />} />
+          <Route exact={true} path="/" element={<Landing />} />
+          <Route exact={true} path="/Login" element={<LogIn />} />
           <Route exact={true} path="/SignUp" element={<SignUp />} />
           <Route exact={true} path="/Register" element={<RegisterOptions />} />
           <Route exact={true} path="/Register/AddClass" element={<AddClass />} />

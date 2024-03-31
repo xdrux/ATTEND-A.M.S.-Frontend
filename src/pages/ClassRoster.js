@@ -16,6 +16,7 @@ class ClassRoster extends React.Component {
         super(props);
         this.state = {
             isActive: false,
+            isLoggedIn: true,
             back: false,
             isAddStudentClicked: false,
             isDeleteAllClicked: false,
@@ -28,47 +29,60 @@ class ClassRoster extends React.Component {
         };
     }
 
-    componentDidMount() {
+    componentDidMount = async () => {
+        // Set isActive after a delay for the fade-in effect
+        this.timeout = setTimeout(() => {
+            this.setState({ isActive: true, loading: true });
+        }, 100);
 
-        this.setState({ loading: true }, () => {
-            // Set isActive to true after a short delay to trigger the fade-in effect
-            this.timeout = setTimeout(() => {
-                this.setState({ isActive: true });
-            }, 100); // Adjust the delay time as needed
-            const section = {
-                courseYear: this.props.classId
+        try {
+            // Make the first fetch and wait for response
+            const loggedInResponse = await fetch("http://localhost:3001/checkIfLoggedIn", {
+                method: "POST",
+                credentials: "include",
+            });
+            const loggedInBody = await loggedInResponse.json();
+            console.log(loggedInBody)
+
+            // Update state based on login status
+            if (loggedInBody.isLoggedIn) {
+                this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
+
+                // Logged in, proceed with other fetches
+                const section = {
+                    courseYear: this.props.classId
+                };
+
+                const classInfoResponse = await fetch("http://localhost:3001/getClassInfo", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(section)
+                });
+                const classInfo = await classInfoResponse.json();
+
+                const studentsResponse = await fetch("http://localhost:3001/getStudentsName", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(section)
+                });
+                const students = await studentsResponse.json();
+
+                this.setState({ classInfo, students });
+            } else {
+                // Not logged in, handle accordingly (e.g., redirect to login)
+                this.setState({ isLoggedIn: false });
+                // ... handle not logged in scenario
             }
+        } catch (error) {
+            console.error(error);
+            // Handle errors appropriately, e.g., display an error message
+        } finally {
+            // Set loading state to false even if errors occur
+            this.setState({ loading: false });
+        }
+    };
 
-            fetch(
-                "http://localhost:3001/getClassInfo",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(section)
-                }).then(response => response.json())
-                .then(body => {
-                    this.setState({ classInfo: body });
-                    this.setState({ loading: false });
-                });
 
-            fetch(
-                "http://localhost:3001/getStudentsName",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(section)
-                }).then(response => response.json())
-                .then(body => {
-                    this.setState({ students: body });
-                    this.setState({ loading: false });
-                });
-        });
-
-    }
 
     componentWillUnmount() {
         clearTimeout(this.timeout); // Clear the timeout on component unmount
@@ -226,8 +240,12 @@ class ClassRoster extends React.Component {
     };
 
     render() {
-        const { isAddStudentClicked, students, isDeleteAllClicked, loading, classInfo } = this.state;
+        const { isLoggedIn, isAddStudentClicked, students, isDeleteAllClicked, loading, classInfo } = this.state;
         const loadingColor = 'rgb(123, 17, 19)';
+
+        if (isLoggedIn === false) {
+            return <Navigate to="/login" />
+        }
 
         if (isAddStudentClicked) {
             const url = `/Register/MyClasses/ClassRoster/${this.props.classId}/AddStudent`;

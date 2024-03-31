@@ -10,6 +10,7 @@ class ScannableClasses extends React.Component {
         super(props);
         this.state = {
             isActive: false,
+            isLoggedIn: true,
             back: false,
             classes: [],
             classInfo: [],
@@ -17,37 +18,41 @@ class ScannableClasses extends React.Component {
         };
     }
 
-    componentDidMount() {
+    componentDidMount = async () => {
+        // Set isActive after a delay for the fade-in effect
         this.timeout = setTimeout(() => {
             this.setState({ isActive: true });
         }, 100);
 
+        try {
+            // Make the first fetch and wait for response
+            const loggedInResponse = await fetch("http://localhost:3001/checkIfLoggedIn", {
+                method: "POST",
+                credentials: "include",
+            });
+            const loggedInBody = await loggedInResponse.json();
 
-        fetch("http://127.0.0.1:4000/getAvailableClasses")
-            .then(response => response.json())
-            .then(body => {
-                console.log(body)
-                this.setState({ classes: body.h5_files }, () => {
-                    // Iterate over each class and fetch additional information
+            // Update state based on login status
+            if (loggedInBody.isLoggedIn) {
+                this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
+
+                // Proceed with other fetches only if logged in
+                const classesResponse = await fetch("http://127.0.0.1:4000/getAvailableClasses");
+                const classesBody = await classesResponse.json();
+
+                this.setState({ classes: classesBody.h5_files }, () => {
+                    // Iterate over classes and fetch additional info (only if logged in)
                     this.state.classes.forEach(courseYear => {
-                        const section = {
-                            courseYear: courseYear
-                        };
+                        const section = { courseYear };
 
                         fetch("http://localhost:3001/getClassInfo", {
                             method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
+                            headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(section)
                         })
                             .then(response => response.json())
                             .then(body => {
-                                console.log(body);
-                                // Save the response to classInfo state
-                                this.setState(prevState => ({
-                                    classInfo: [...prevState.classInfo, body]
-                                }), () => {
+                                this.setState(prevState => ({ classInfo: [...prevState.classInfo, body] }), () => {
                                     this.createClasses();
                                 });
                             })
@@ -56,13 +61,15 @@ class ScannableClasses extends React.Component {
                             });
                     });
                 });
-            })
-            .catch(error => {
-                console.error("Error fetching available classes:", error);
-            });
-
-
-    }
+            } else {
+                this.setState({ isLoggedIn: false });
+                // Handle not logged in scenario (e.g., redirect to login)
+            }
+        } catch (error) {
+            console.error("Error during fetch:", error);
+            // Handle errors appropriately, e.g., display an error message
+        }
+    };
 
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -164,7 +171,11 @@ class ScannableClasses extends React.Component {
     }
 
     render() {
-        const { isClicked, selectedClass } = this.state;
+        const { isLoggedIn, isClicked, selectedClass } = this.state;
+
+        if (isLoggedIn === false) {
+            return <Navigate to="/login" />
+        }
 
         if (isClicked) {
             const url = `/Scan/${selectedClass}`;

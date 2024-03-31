@@ -9,6 +9,8 @@ class Landing extends React.Component {
         super(props);
         this.state = {
             isActive: false,
+            isLoggedIn: true,
+            useremail: localStorage.getItem("useremail"),
             redirectToRegister: false,
             redirectToScan: false,
             redirectToExport: false
@@ -19,6 +21,21 @@ class Landing extends React.Component {
         // Set isActive to true after a short delay to trigger the fade-in effect
         this.timeout = setTimeout(() => {
             this.setState({ isActive: true });
+            console.log(document.cookie)
+            fetch("http://localhost:3001/checkIfLoggedIn",
+                {
+                    method: "POST",
+                    credentials: "include"
+                })
+                .then(response => response.json())
+                .then(body => {
+                    console.log(body)
+                    if (body.isLoggedIn) {
+                        this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
+                    } else {
+                        this.setState({ isLoggedIn: false });
+                    }
+                });
         }, 100); // Adjust the delay time as needed
     }
 
@@ -39,6 +56,11 @@ class Landing extends React.Component {
     };
 
     render() {
+        const { isLoggedIn } = this.state;
+
+        if (isLoggedIn === false) {
+            return <Navigate to="/login" />
+        }
         return (
             <div className="Bg">
                 <div className={`fade-in ${this.state.isActive ? 'active' : ''}`}>
