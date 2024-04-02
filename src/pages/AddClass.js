@@ -23,7 +23,7 @@ class AddClass extends React.Component {
             classSection: "",
             semester: "",
             acadYear: "",
-            type: this.options[0],
+            classType: this.options[0],
             selectedStartDate: null,
             startdatePickerOpen: false,
             selectedEndDate: null,
@@ -38,6 +38,8 @@ class AddClass extends React.Component {
     }
 
     componentDidMount() {
+        console.log(this.state.classType)
+        // console.log(localStorage.getItem('useremail'))
         // Set isActive to true after a short delay to trigger the fade-in effect
         this.timeout = setTimeout(() => {
             this.setState({ isActive: true });
@@ -65,8 +67,8 @@ class AddClass extends React.Component {
 
 
     validateForm = () => {
-        const { courseName, courseCode, classSection, semester, acadYear, type, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
-        console.log(semester, acadYear, type)
+        const { courseName, courseCode, classSection, semester, acadYear, classType, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
+        console.log(semester, acadYear, classType)
         var errors = "";
         var isComplete = true;
 
@@ -88,7 +90,7 @@ class AddClass extends React.Component {
             if (acadYear.trim().length === 0) {
                 errors += "<p>*Academic Year is required</p>";
             }
-            if (type.trim().length === 0) {
+            if (classType.trim().length === 0) {
                 errors += "<p>*Type is required</p>";
             }
 
@@ -135,7 +137,7 @@ class AddClass extends React.Component {
                 'thu': 4,
                 'fri': 5,
             };
-            const { courseName, courseCode, classSection, semester, acadYear, type, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
+            const { courseName, courseCode, classSection, semester, acadYear, classType, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
             const selectedWeekdayNumbers = selectedWeekdays.map(weekday => weekdayNumberMap[weekday]);
             const courseNSec = courseCode.concat(" ", classSection)
             let courseYear = courseNSec.concat(" ", semester)
@@ -150,12 +152,13 @@ class AddClass extends React.Component {
                 semester: semester,
                 acadYear: acadYear,
                 courseYear: courseYear,
-                type: type.value,
+                classType: classType,
                 courseSchedule: selectedWeekdayNumbers,
                 courseStartDate: Date1,
                 courseEndDate: Date2,
                 courseStartTime: selectedStartTime,
                 courseEndTime: selectedEndTime,
+                instructor: localStorage.getItem('useremail')
             }
             console.log(course)
             fetch(
@@ -209,7 +212,7 @@ class AddClass extends React.Component {
     };
 
     handleTypeChange = selectedOption => {
-        this.setState({ type: selectedOption });
+        this.setState({ classType: selectedOption });
         console.log(selectedOption.label)
     };
 

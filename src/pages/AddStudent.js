@@ -3,6 +3,11 @@ import { useParams } from 'react-router-dom';
 import './css/common.css';
 import backIcon from './../assets/back.png'
 import logo from './../assets/appLogo.png';
+import faceFront from './../assets/faceFront.jpg';
+import faceLeft from './../assets/faceLeft.jpg';
+import faceRight from './../assets/faceRight.jpg';
+import faceUp from './../assets/faceUp.jpg';
+import faceDown from './../assets/faceDown.jpg';
 import './css/AddClass.css';
 import './css/AddStudent.css';
 import './css/FaceCollectionOverlay.css'
@@ -10,6 +15,7 @@ import { Navigate } from "react-router-dom";
 import 'react-datepicker/dist/react-datepicker.css';
 import { toast } from 'react-toastify';
 import Webcam from 'react-webcam';
+import { Stepper } from 'react-form-stepper';
 
 class AddStudent extends React.Component {
     constructor(props) {
@@ -277,6 +283,8 @@ class Overlay extends React.Component {
             selectedVideoSource: null, // Initialize selected video source
             videoSources: [], // Available video sources
             samplingInProgress: false,
+            samplingStage: 1,
+            activeStep: 0
         };
     }
 
@@ -293,6 +301,10 @@ class Overlay extends React.Component {
         } catch (error) {
             console.error('Error enumerating video sources:', error);
         }
+    };
+
+    handleStepChange = (step) => {
+        this.setState({ activeStep: step });
     };
 
     // Change the selected video source
@@ -322,38 +334,254 @@ class Overlay extends React.Component {
 
     // Start sampling process
     startSampling = () => {
-        var coundown = 20;
+        const { samplingStage } = this.state;
+
+        var coundown = 4;
         const countdownText = document.getElementById("samplingCountdown");
         const startButton = document.getElementById("startButton");
-        startButton.style.display = "none";
+        startButton.style.visibility = "hidden";
         const backButton = document.getElementById("overlayFCBack");
-        backButton.style.display = "none";
-        if (!this.state.samplingInProgress) {
-            this.setState({ samplingInProgress: true }, () => {
-                // Execute captureImage every 0.5 seconds for 5 seconds
-                const intervalId = setInterval(() => {
-                    this.captureImage();
-                    countdownText.innerText = Math.round((coundown - 1) / 4) + " seconds...";
-                    coundown--;
-                }, 250);
+        backButton.style.visibility = "hidden";
+        const samplingPic = document.getElementById("samplingPic");
+        const startButtonText = document.getElementById("startButtonText");
+        const currentAngle = document.getElementById("currentAngle")
+
+        if (samplingStage === 1) {
+            if (!this.state.samplingInProgress) {
+                this.setState({ samplingInProgress: true }, () => {
+                    // Execute captureImage every 0.5 seconds for 5 seconds
+                    const intervalId = setInterval(() => {
+                        this.captureImage();
+                        countdownText.innerText = Math.round((coundown - 1) / 2) + " seconds...";
+                        coundown--;
+                    }, 500);
 
 
-                // Stop sampling process after 5 seconds
-                setTimeout(() => {
-                    clearInterval(intervalId);
-                    this.setState({ samplingInProgress: false });
-                    this.props.onDataSubmit(this.state.inputData);
+                    // Stop sampling process after 5 seconds
+                    setTimeout(() => {
+                        clearInterval(intervalId);
+                        this.setState({ samplingInProgress: false });
+                        countdownText.innerText = "";
+                        this.setState({ samplingStage: 2 });
+                        startButtonText.textContent = "Continue";
+                        startButton.style.visibility = "visible";
+                        backButton.style.visibility = "visible";
+                        samplingPic.src = faceLeft;
+                        currentAngle.textContent = "Tilt to the left";
+                        this.handleStepChange(1);
 
-                    // Clear input data after submitting
-                    this.setState({ inputData: '' });
 
-                    // Close the overlay
-                    this.props.onClose();
-                }, 5000);
-            });
+                        // this.props.onDataSubmit(this.state.inputData);
+
+                        // // Clear input data after submitting
+                        // this.setState({ inputData: '' });
+
+                        // // Close the overlay
+                        // this.props.onClose();
+                    }, 2000);
+                });
+            }
+        } else if (samplingStage === 2) {
+            if (!this.state.samplingInProgress) {
+                this.setState({ samplingInProgress: true }, () => {
+                    // Execute captureImage every 0.5 seconds for 5 seconds
+                    const intervalId = setInterval(() => {
+                        this.captureImage();
+                        countdownText.innerText = Math.round((coundown - 1) / 2) + " seconds...";
+                        coundown--;
+                    }, 500);
+
+
+                    // Stop sampling process after 5 seconds
+                    setTimeout(() => {
+                        clearInterval(intervalId);
+                        this.setState({ samplingInProgress: false });
+                        countdownText.innerText = "";
+                        this.setState({ samplingStage: 3 });
+                        startButton.style.visibility = "visible";
+                        backButton.style.visibility = "visible";
+                        samplingPic.src = faceRight;
+                        currentAngle.textContent = "Tilt to the right";
+                        this.handleStepChange(2);
+
+                        // this.props.onDataSubmit(this.state.inputData);
+
+                        // // Clear input data after submitting
+                        // this.setState({ inputData: '' });
+
+                        // // Close the overlay
+                        // this.props.onClose();
+                    }, 2000);
+                });
+            }
+        } else if (samplingStage === 3) {
+            if (!this.state.samplingInProgress) {
+                this.setState({ samplingInProgress: true }, () => {
+                    // Execute captureImage every 0.5 seconds for 5 seconds
+                    const intervalId = setInterval(() => {
+                        this.captureImage();
+                        countdownText.innerText = Math.round((coundown - 1) / 2) + " seconds...";
+                        coundown--;
+                    }, 500);
+
+
+                    // Stop sampling process after 5 seconds
+                    setTimeout(() => {
+                        clearInterval(intervalId);
+                        this.setState({ samplingInProgress: false });
+                        countdownText.innerText = "";
+                        this.setState({ samplingStage: 4 });
+                        startButton.style.visibility = "visible";
+                        backButton.style.visibility = "visible";
+                        samplingPic.src = faceUp;
+                        currentAngle.textContent = "Tilt upwards";
+                        this.handleStepChange(3);
+
+                        // this.props.onDataSubmit(this.state.inputData);
+
+                        // // Clear input data after submitting
+                        // this.setState({ inputData: '' });
+
+                        // // Close the overlay
+                        // this.props.onClose();
+                    }, 2000);
+                });
+            }
+        } else if (samplingStage === 4) {
+            if (!this.state.samplingInProgress) {
+                this.setState({ samplingInProgress: true }, () => {
+                    // Execute captureImage every 0.5 seconds for 5 seconds
+                    const intervalId = setInterval(() => {
+                        this.captureImage();
+                        countdownText.innerText = Math.round((coundown - 1) / 2) + " seconds...";
+                        coundown--;
+                    }, 500);
+
+
+                    // Stop sampling process after 5 seconds
+                    setTimeout(() => {
+                        clearInterval(intervalId);
+                        this.setState({ samplingInProgress: false });
+                        countdownText.innerText = "";
+                        this.setState({ samplingStage: 5 });
+                        startButton.style.visibility = "visible";
+                        backButton.style.visibility = "visible";
+                        samplingPic.src = faceDown;
+                        currentAngle.textContent = "Tilt downwards"
+                        this.handleStepChange(5);
+
+
+                        // this.props.onDataSubmit(this.state.inputData);
+
+                        // // Clear input data after submitting
+                        // this.setState({ inputData: '' });
+
+                        // // Close the overlay
+                        // this.props.onClose();
+                    }, 2000);
+                });
+            }
+        } else if (samplingStage === 5) {
+            if (!this.state.samplingInProgress) {
+                this.setState({ samplingInProgress: true }, () => {
+                    // Execute captureImage every 0.5 seconds for 5 seconds
+                    const intervalId = setInterval(() => {
+                        this.captureImage();
+                        countdownText.innerText = Math.round((coundown - 1) / 2) + " seconds...";
+                        coundown--;
+                    }, 500);
+
+
+                    // Stop sampling process after 5 seconds
+                    setTimeout(() => {
+                        clearInterval(intervalId);
+                        this.setState({ samplingInProgress: false });
+                        countdownText.innerText = "";
+                        startButton.style.visibility = "visible";
+                        backButton.style.visibility = "visible";
+                        // samplingPic.src = faceDown;
+                        console.log(this.state.inputData)
+
+                        this.props.onDataSubmit(this.state.inputData);
+
+                        // Clear input data after submitting
+                        this.setState({ inputData: '' });
+
+                        // Close the overlay
+                        this.props.onClose();
+                    }, 2000);
+                });
+            }
         }
 
+
+        // var coundown = 20;
+        // const countdownText = document.getElementById("samplingCountdown");
+        // const startButton = document.getElementById("startButton");
+        // startButton.style.display = "none";
+        // const backButton = document.getElementById("overlayFCBack");
+        // backButton.style.display = "none";
+        // if (!this.state.samplingInProgress) {
+        //     this.setState({ samplingInProgress: true }, () => {
+        //         // Execute captureImage every 0.5 seconds for 5 seconds
+        //         const intervalId = setInterval(() => {
+        //             this.captureImage();
+        //             countdownText.innerText = Math.round((coundown - 1) / 4) + " seconds...";
+        //             coundown--;
+        //         }, 250);
+
+
+        //         // Stop sampling process after 5 seconds
+        //         setTimeout(() => {
+        //             clearInterval(intervalId);
+        //             this.setState({ samplingInProgress: false });
+        //             this.props.onDataSubmit(this.state.inputData);
+
+        //             // Clear input data after submitting
+        //             this.setState({ inputData: '' });
+
+        //             // Close the overlay
+        //             this.props.onClose();
+        //         }, 5000);
+        //     });
+        // }
+
     };
+
+    // // Start sampling process
+    // startSampling = () => {
+    //     var coundown = 20;
+    //     const countdownText = document.getElementById("samplingCountdown");
+    //     const startButton = document.getElementById("startButton");
+    //     startButton.style.display = "none";
+    //     const backButton = document.getElementById("overlayFCBack");
+    //     backButton.style.display = "none";
+    //     if (!this.state.samplingInProgress) {
+    //         this.setState({ samplingInProgress: true }, () => {
+    //             // Execute captureImage every 0.5 seconds for 5 seconds
+    //             const intervalId = setInterval(() => {
+    //                 this.captureImage();
+    //                 countdownText.innerText = Math.round((coundown - 1) / 4) + " seconds...";
+    //                 coundown--;
+    //             }, 250);
+
+
+    //             // Stop sampling process after 5 seconds
+    //             setTimeout(() => {
+    //                 clearInterval(intervalId);
+    //                 this.setState({ samplingInProgress: false });
+    //                 this.props.onDataSubmit(this.state.inputData);
+
+    //                 // Clear input data after submitting
+    //                 this.setState({ inputData: '' });
+
+    //                 // Close the overlay
+    //                 this.props.onClose();
+    //             }, 5000);
+    //         });
+    //     }
+
+    // };
 
     drawRectangle() {
         const element = document.getElementById('videoStream');
@@ -384,6 +612,7 @@ class Overlay extends React.Component {
     }
 
     render() {
+        const { activeStep } = this.state;
         return (
             <div className="overlay">
                 <div className="overlay-content">
@@ -414,6 +643,7 @@ class Overlay extends React.Component {
                                 ref={this.webcamRef}
                                 width="50%"
                                 height="auto"
+                                mirrored={true}
                                 videoConstraints={{
                                     deviceId: this.state.selectedVideoSource ? { exact: this.state.selectedVideoSource } : undefined,
                                 }}
@@ -421,9 +651,17 @@ class Overlay extends React.Component {
                             <canvas id="canvasPhoto" ref={this.canvasRef} width={640} height={480}></canvas>
                         </div>
                     </div>
+                    <img id="samplingPic" src={faceFront} alt="faceFront" />
                     <div>
+                        <Stepper
+                            activeStep={activeStep}
+                            onSelect={this.handleStepChange}
+                            steps={[{ label: '' }, { label: '' }, { label: '' }, { label: '' }, { label: '' }]}
+                        />
                         <div id="samplingDescription">
-                            <p id="samplingText">The sampling process would take around 5 seconds. Please keep a neutral face in the box and look directly at the camera. Ensure that the face fully occupies the box.</p>
+                            {/* <p id="samplingText">The sampling process would take around 5 seconds. Please keep a neutral face in the box and look directly at the camera. Ensure that the face fully occupies the box.</p> */}
+                            <p id="samplingText">The sampling process includes capturing face photos at different angles. Please follow the current sample photo and keep a neutral face in the box. Ensure that the face fully occupies the box.</p>
+                            <p id="currentAngle">Look directly at the camera</p>
                         </div>
                         <p id="samplingCountdown"></p>
                         <div id="startButton" onClick={this.startSampling}>

@@ -66,9 +66,21 @@
     position: absolute;
     width: 38vw;
     height: 20%;
-    top: 25vh;
+    top: 21vh;
     right: 8.5vw;
 }
+
+/* #samplingDescription {
+    position: absolute;
+    width: 38vw;
+    height: 50%;
+    top: 25vh;
+    right: 8.5vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+} */
 
 #samplingText {
     font-size: 3.45vh;
@@ -99,10 +111,18 @@
 
 #samplingCountdown {
     position: absolute;
-    top: 50vh;
+    top: 71vh;
     right: 23vw;
     font-size: 3.5vh;
     font-style: italic;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     color: rgb(123, 17, 19);
+}
+
+#currentAngle {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: rgb(123, 17, 19);
+    font-size: 4vh;
+    text-align: center;
+    margin-top: 12vh;
 }

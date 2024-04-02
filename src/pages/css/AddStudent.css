@@ -7,3 +7,10 @@
 #addFSampleText {
     font-family: Arial, Helvetica, sans-serif;
 }
+
+#samplingPic {
+    width: 10vw;
+    position: absolute;
+    top: 21vh;
+    left: 42.5vw;
+}

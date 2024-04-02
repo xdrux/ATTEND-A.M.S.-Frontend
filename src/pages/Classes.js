@@ -41,7 +41,7 @@ class Classes extends React.Component {
             }
 
             // Now that login status is confirmed, make the second fetch
-            const classesResponse = await fetch("http://localhost:3001/getClasses");
+            const classesResponse = await fetch(`http://localhost:3001/getClasses?user=${localStorage.getItem('useremail')}`);
             const classesBody = await classesResponse.json();
 
             this.setState({ classes: classesBody.classes, semester: classesBody.semester, acadYear: classesBody.acadYear });

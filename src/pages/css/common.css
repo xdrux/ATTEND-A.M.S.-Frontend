@@ -278,3 +278,12 @@ p {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     visibility: hidden;
 }
+
+.StepperContainer-0-2-1 {
+    width: 40vw;
+    position: absolute;
+    top: 77vh;
+    left: 51vw;
+    display: flex;
+    /* Adjust the styling of the separators */
+}

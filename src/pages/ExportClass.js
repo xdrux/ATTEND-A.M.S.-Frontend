@@ -28,41 +28,42 @@ class ExportClass extends React.Component {
         }, 100);
 
         try {
-            // Make the first fetch and wait for response
+            // Make the first fetch to check if logged in
             const loggedInResponse = await fetch("http://localhost:3001/checkIfLoggedIn", {
                 method: "POST",
                 credentials: "include",
             });
+
             const loggedInBody = await loggedInResponse.json();
+            console.log(loggedInBody);
 
-            // Update state based on login status
             if (loggedInBody.isLoggedIn) {
-                this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
-
                 // Proceed with other fetches only if logged in
                 const classesResponse = await fetch("http://127.0.0.1:4000/getAvailableClasses");
                 const classesBody = await classesResponse.json();
 
-                this.setState({ classes: classesBody.h5_files }, () => {
-                    // Iterate over classes and fetch additional info (only if logged in)
-                    this.state.classes.forEach(courseYear => {
+                this.setState({ classes: classesBody.h5_files }, async () => {
+                    // Iterate over classes and fetch additional info
+                    const classInfo = [];
+                    for (const courseYear of this.state.classes) {
                         const section = { courseYear };
-
-                        fetch("http://localhost:3001/getClassInfo", {
+                        const response = await fetch("http://localhost:3001/getClassInfo", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(section)
-                        })
-                            .then(response => response.json())
-                            .then(body => {
-                                this.setState(prevState => ({ classInfo: [...prevState.classInfo, body] }), () => {
-                                    this.createClasses();
-                                });
-                            })
-                            .catch(error => {
-                                console.error("Error fetching class info:", error);
-                            });
-                    });
+                            body: JSON.stringify(section),
+                        });
+                        const body = await response.json();
+                        if (body.instructor === localStorage.getItem("useremail")) {
+                            classInfo.push(body);
+                        } else {
+                            // Filter out the current courseYear from classes
+                            const filteredClasses = this.state.classes.filter(courseYear => courseYear !== section.courseYear);
+                            this.setState({ classes: filteredClasses });
+                        }
+                    }
+
+                    // Update classInfo state and then call createClasses
+                    this.setState({ classInfo }, () => this.createClasses());
                 });
             } else {
                 this.setState({ isLoggedIn: false });
@@ -73,6 +74,7 @@ class ExportClass extends React.Component {
             // Handle errors appropriately, e.g., display an error message
         }
     };
+
 
 
     componentWillUnmount() {
