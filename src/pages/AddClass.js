@@ -21,6 +21,7 @@ class AddClass extends React.Component {
             courseName: "",
             courseCode: "",
             classSection: "",
+            gracePeriod: "",
             semester: "",
             acadYear: "",
             classType: this.options[0],
@@ -67,31 +68,33 @@ class AddClass extends React.Component {
 
 
     validateForm = () => {
-        const { courseName, courseCode, classSection, semester, acadYear, classType, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
+        const { courseName, courseCode, classSection, gracePeriod, semester, acadYear, classType, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
         console.log(semester, acadYear, classType)
         var errors = "";
         var isComplete = true;
 
-        if (courseName.trim().length === 0 || courseCode.trim().length === 0 || classSection.trim().length === 0 || semester.trim().length === 0 || acadYear.trim().length === 0 || !selectedStartDate || !selectedEndDate || !selectedStartTime || !selectedEndTime || selectedWeekdays.length === 0) {
+        if (courseName.trim().length === 0 || courseCode.trim().length === 0 || classSection.trim().length === 0 || gracePeriod.trim().length === 0 || /^\d+$/.test(gracePeriod) === false || semester.trim().length === 0 || acadYear.trim().length === 0 || !selectedStartDate || !selectedEndDate || !selectedStartTime || !selectedEndTime || selectedWeekdays.length === 0) {
             isComplete = false;
             if (courseName.trim().length === 0) {
                 errors += "<p>*Course Name is required</p>";
             }
-            if (courseCode.trim().length === 0) {
-                errors += "<p>*Course Code is required</p>";
+            if (courseCode.trim().length === 0 || classSection.trim().length === 0) {
+                errors += "<p>*Code and Section are required</p>";
             }
 
-            if (classSection.trim().length === 0) {
-                errors += "<p>*Course Section is required</p>";
+            if (gracePeriod.trim().length === 0) {
+                errors += "<p>*Grace Period is required</p>";
             }
+
             if (semester.trim().length === 0) {
                 errors += "<p>*Semester is required</p>";
             }
             if (acadYear.trim().length === 0) {
                 errors += "<p>*Academic Year is required</p>";
             }
-            if (classType.trim().length === 0) {
-                errors += "<p>*Type is required</p>";
+
+            if (/^\d+$/.test(gracePeriod) === false) {
+                errors += "<p>*Invalid Grace Period value</p>";
             }
 
             if (selectedWeekdays.length === 0) {
@@ -137,7 +140,7 @@ class AddClass extends React.Component {
                 'thu': 4,
                 'fri': 5,
             };
-            const { courseName, courseCode, classSection, semester, acadYear, classType, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
+            const { courseName, courseCode, classSection, semester, gracePeriod, acadYear, classType, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
             const selectedWeekdayNumbers = selectedWeekdays.map(weekday => weekdayNumberMap[weekday]);
             const courseNSec = courseCode.concat(" ", classSection)
             let courseYear = courseNSec.concat(" ", semester)
@@ -149,6 +152,7 @@ class AddClass extends React.Component {
                 courseCode: courseCode,
                 courseSection: classSection,
                 courseNameSection: courseNSec,
+                gracePeriod: Number(gracePeriod),
                 semester: semester,
                 acadYear: acadYear,
                 courseYear: courseYear,
@@ -211,8 +215,12 @@ class AddClass extends React.Component {
         this.setState({ classSection: event.target.value });
     };
 
+    handleGracePeriodChange = (event) => {
+        this.setState({ gracePeriod: event.target.value });
+    };
+
     handleTypeChange = selectedOption => {
-        this.setState({ classType: selectedOption });
+        this.setState({ classType: selectedOption.value });
         console.log(selectedOption.label)
     };
 
@@ -283,7 +291,7 @@ class AddClass extends React.Component {
     };
 
     render() {
-        const { isLoggedIn, courseName, courseCode, classSection, semester, acadYear, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays, goHome } = this.state;
+        const { isLoggedIn, courseName, courseCode, classSection, gracePeriod, semester, acadYear, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays, goHome } = this.state;
         if (goHome) {
             return <Navigate to="/" />;
         }
@@ -306,6 +314,12 @@ class AddClass extends React.Component {
                     </div>
                     <form className="formBlock" id="formBlockClass">
                         <div className="formItem">
+                            <p className="FormLabel">Type</p>
+                            <Dropdown className="custom-dropdown"
+                                controlClassName="custom-dropdown-control"
+                                menuClassName="custom-dropdown-option" options={this.options} onChange={this.handleTypeChange} value={this.options[0]} placeholder="Select an option" />
+                        </div>
+                        <div className="formItem">
                             <label className="FormLabel" htmlFor="courseName">Course Title</label>
                             <input
                                 type="text"
@@ -319,7 +333,7 @@ class AddClass extends React.Component {
                             />
                         </div>
                         <div className="formItem">
-                            <label className="FormLabel" htmlFor="courseCode">Course Code</label>
+                            <label className="FormLabel" htmlFor="courseCode">Code & Section</label>
                             <input
                                 type="text"
                                 name="courseCode"
@@ -330,10 +344,6 @@ class AddClass extends React.Component {
                                 placeholder="e.g. CMSC 12"
                                 required
                             />
-                            <p id='e-courseCode' className='S-Error'></p>
-                        </div>
-                        <div className="formItem">
-                            <label className="FormLabel" htmlFor="classSection">Class Section</label>
                             <input
                                 type="text"
                                 name="classSection"
@@ -341,7 +351,21 @@ class AddClass extends React.Component {
                                 id="classSection"
                                 value={classSection}
                                 onChange={this.handleClassSectionChange}
-                                placeholder="e.g. T"
+                                placeholder="e.g. T1L"
+                                required
+                            />
+                            <p id='e-courseCode' className='S-Error'></p>
+                        </div>
+                        <div className="formItem">
+                            <label className="FormLabel" htmlFor="gracePeriod">Grace Period (mins)</label>
+                            <input
+                                type="text"
+                                name="gracePeriod"
+                                className="FormTextArea"
+                                id="gracePeriod"
+                                value={gracePeriod}
+                                onChange={this.handleGracePeriodChange}
+                                placeholder="e.g. 15"
                                 required
                             />
                             <p id='e-courseSection' className='S-Error'></p>
@@ -386,12 +410,7 @@ class AddClass extends React.Component {
                             />
                             <p id='e-courseCode' className='S-Error'></p>
                         </div> */}
-                        <div className="formItem">
-                            <p className="FormLabel">Type</p>
-                            <Dropdown className="custom-dropdown"
-                                controlClassName="custom-dropdown-control"
-                                menuClassName="custom-dropdown-option" options={this.options} onChange={this.handleTypeChange} value={this.options[0]} placeholder="Select an option" />
-                        </div>
+
                         <div className="formItem">
                             <p className="FormLabel">Class Schedule</p>
                             <div className="checkbox-container">

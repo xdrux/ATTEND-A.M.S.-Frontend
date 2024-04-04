@@ -274,3 +274,8 @@ input[type="checkbox"] {
     position: static;
     z-index: 9999999;
 }
+
+#classSection {
+    position: absolute;
+    left: 68vw;
+}
