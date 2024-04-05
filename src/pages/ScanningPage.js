@@ -533,6 +533,7 @@ const ScanningPageWrapper = () => {
 export default ScanningPageWrapper;
 
 class BigDeleteOverlay extends React.Component {
+    intervalId = null;
     // constructor(props) {
     //     super(props);
     //     this.state = {
@@ -541,19 +542,28 @@ class BigDeleteOverlay extends React.Component {
     // }
 
     componentDidMount() {
-        this.updateCountdown();
+        this.updateCountdown(); // Start the countdown when component mounts
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.intervalId); // Clear interval when component unmounts
     }
 
     updateCountdown = () => {
-        let countdown = 10; // Corrected variable name
+        let countdown = 10;
         const countdownText = document.getElementById("countdownResult");
 
-        const intervalId = setInterval(() => {
+        // Clear previous interval if exists
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+        }
+
+        this.intervalId = setInterval(() => {
             countdownText.innerText = Math.round((countdown - 1) / 2);
             countdown--;
 
             if (countdown === 0) {
-                clearInterval(intervalId); // Clear interval when countdown reaches 0
+                clearInterval(this.intervalId);
                 this.handleNothingClick();
             }
         }, 500);

@@ -20,13 +20,14 @@
 
 #infoContainer {
     position: absolute;
-    top: 17vh;
+    top: 24vh;
     margin-left: 5vw;
     width: 45vw;
     height: 5vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 1;
 }
 
 #infoContent {

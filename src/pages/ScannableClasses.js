@@ -38,18 +38,21 @@ class ScannableClasses extends React.Component {
                 // Proceed with other fetches only if logged in
                 const classesResponse = await fetch("http://127.0.0.1:4000/getAvailableClasses");
                 const classesBody = await classesResponse.json();
+                console.log(classesBody);
 
                 this.setState({ classes: classesBody.h5_files }, async () => {
                     // Iterate over classes and fetch additional info
                     const classInfo = [];
                     for (const courseYear of this.state.classes) {
                         const section = { courseYear };
+                        // console.log(section);
                         const response = await fetch("http://localhost:3001/getClassInfo", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(section),
                         });
                         const body = await response.json();
+                        console.log(body)
                         if (body.instructor === localStorage.getItem("useremail")) {
                             classInfo.push(body);
                         } else {
