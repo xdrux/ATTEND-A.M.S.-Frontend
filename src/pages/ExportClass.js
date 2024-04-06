@@ -161,7 +161,7 @@ class ExportClass extends React.Component {
                             // Count absences and lates for the day
                             if (isPresent.toLowerCase() === "late") {
                                 attendanceMap.get(studentName)["Number of Lates"]++;
-                            } else if (isPresent.toLowerCase() === "no") {
+                            } else if (isPresent.toLowerCase() === "absent") {
                                 attendanceMap.get(studentName)["Number of Absences"]++;
                             }
 
@@ -176,7 +176,7 @@ class ExportClass extends React.Component {
 
                             if (isPresent.toLowerCase() === "late") {
                                 totals[date].lates++;
-                            } else if (isPresent.toLowerCase() === "no") {
+                            } else if (isPresent.toLowerCase() === "absent") {
                                 totals[date].absences++;
                             }
                         });
