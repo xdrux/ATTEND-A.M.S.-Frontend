@@ -287,3 +287,7 @@ p {
     display: flex;
     /* Adjust the styling of the separators */
 }
+
+.hidden {
+    display: none;
+}

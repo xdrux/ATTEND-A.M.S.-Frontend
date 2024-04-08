@@ -5,6 +5,7 @@ import './css/ClassRoster.css'
 import backIcon from './../assets/back.png'
 import logo from './../assets/appLogo.png';
 import trash from './../assets/trash.png';
+import editIcon from './../assets/editIcon.png';
 import { Navigate } from "react-router-dom";
 import JSZip from 'jszip';
 import { toast } from 'react-toastify';
@@ -25,7 +26,10 @@ class ClassRoster extends React.Component {
             students: [],
             folderNames: null,
             faceSamples: null,
-            loading: false
+            loading: false,
+            isEditClicked: false,
+            isViewClicked: false,
+            studentClicked: null
         };
     }
 
@@ -95,6 +99,22 @@ class ClassRoster extends React.Component {
     handleBigDeleteClick = () => {
         this.setState({ isDeleteAllClicked: true });
     };
+
+    handleEditClick = (student, e) => {
+        console.log(student);
+        console.log("HOOIOY")
+        // Prevent event propagation
+        e.stopPropagation();
+        this.setState({ isEditClicked: true, studentClicked: student });
+    }
+
+
+    handleViewClick = (student) => {
+        console.log(student);
+
+        this.setState({ isViewClicked: true, studentClicked: student });
+
+    }
 
     handleTrashDeleteClick = (student) => {
         console.log(student);
@@ -240,11 +260,25 @@ class ClassRoster extends React.Component {
     };
 
     render() {
-        const { isLoggedIn, isAddStudentClicked, students, isDeleteAllClicked, loading, classInfo } = this.state;
+        const { isLoggedIn, isAddStudentClicked, students, isDeleteAllClicked, loading, classInfo, isViewClicked, isEditClicked, studentClicked } = this.state;
         const loadingColor = 'rgb(123, 17, 19)';
 
         if (isLoggedIn === false) {
             return <Navigate to="/login" />
+        }
+
+        if (isViewClicked) {
+            console.log("hehe")
+            const url = `/Register/MyClasses/ClassRoster/${this.props.classId}/${studentClicked}/view`;
+            console.log(url);
+            return <Navigate to={url} replace />;
+        }
+
+        if (isEditClicked) {
+            console.log("HOOOY")
+            const url = `/Register/MyClasses/ClassRoster/${this.props.classId}/${studentClicked}/edit`;
+            console.log(url);
+            return <Navigate to={url} replace />;
         }
 
         if (isAddStudentClicked) {
@@ -288,9 +322,13 @@ class ClassRoster extends React.Component {
                                         {
                                             students.map((student, index) => {
                                                 return (
-                                                    <div key={index} className="studentBlock">
+                                                    <div onClick={() => this.handleViewClick(student)} key={index} className="studentBlock">
                                                         <p className="rosterStudName">{student}</p>
-                                                        <img id={index} onClick={() => this.handleTrashDeleteClick(student)} className="trashIcon" src={trash} alt="trash" />
+                                                        <div>
+                                                            <img id={index.toString() + "_edit"} onClick={(e) => this.handleEditClick(student, e)} className="trashIcon" src={editIcon} alt="edit" />
+                                                            <img id={index} onClick={() => this.handleTrashDeleteClick(student)} className="trashIcon" src={trash} alt="trash" />
+                                                        </div>
+                                                        {/* <img id={index} onClick={() => this.handleTrashDeleteClick(student)} className="trashIcon" src={trash} alt="trash" /> */}
                                                     </div>
                                                 )
                                             })

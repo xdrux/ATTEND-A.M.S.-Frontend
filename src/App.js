@@ -7,6 +7,7 @@ import AddClass from "./pages/AddClass";
 import Classes from "./pages/Classes";
 import ScannableClasses from "./pages/ScannableClasses";
 import ClassRosterWrapper from "./pages/ClassRoster";
+import StudentInfoWraper from "./pages/StudentInfo";
 import AddStudentWrapper from "./pages/AddStudent";
 import ScanningPageWrapper from "./pages/ScanningPage";
 import ExportClass from "./pages/ExportClass";
@@ -26,6 +27,7 @@ function App() {
           <Route exact={true} path="/Register/AddClass" element={<AddClass />} />
           <Route exact={true} path="/Register/MyClasses" element={<Classes />} />
           <Route exact={false} path="/Register/MyClasses/ClassRoster/:classId" element={<ClassRosterWrapper />} />
+          <Route exact={false} path="/Register/MyClasses/ClassRoster/:classId/:student/:action" element={<StudentInfoWraper />} />
           <Route exact={false} path="/Register/MyClasses/ClassRoster/:classId/AddStudent" element={<AddStudentWrapper />} />
           <Route exact={true} path="/Scan" element={<ScannableClasses />} />
           <Route exact={false} path="/Scan/:classId" element={<ScanningPageWrapper />} />
