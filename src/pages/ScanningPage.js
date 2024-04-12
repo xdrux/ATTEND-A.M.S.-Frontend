@@ -479,6 +479,7 @@ class ScanningPage extends React.Component {
                                 ref={this.webcamRef}
                                 width="45%"
                                 height="auto"
+                                mirrored={true}
                                 videoConstraints={{
                                     deviceId: this.state.selectedVideoSource ? { exact: this.state.selectedVideoSource } : undefined,
                                 }}

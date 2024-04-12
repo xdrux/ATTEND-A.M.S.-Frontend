@@ -336,7 +336,7 @@ class Overlay extends React.Component {
     startSampling = () => {
         const { samplingStage } = this.state;
 
-        var coundown = 4;
+        var coundown = 8;
         const countdownText = document.getElementById("samplingCountdown");
         const startButton = document.getElementById("startButton");
         startButton.style.visibility = "hidden";
@@ -352,9 +352,9 @@ class Overlay extends React.Component {
                     // Execute captureImage every 0.5 seconds for 5 seconds
                     const intervalId = setInterval(() => {
                         this.captureImage();
-                        countdownText.innerText = Math.round((coundown - 1) / 2) + " seconds...";
+                        countdownText.innerText = Math.round((coundown - 1) / 8) + " seconds...";
                         coundown--;
-                    }, 500);
+                    }, 250);
 
 
                     // Stop sampling process after 5 seconds
@@ -387,9 +387,9 @@ class Overlay extends React.Component {
                     // Execute captureImage every 0.5 seconds for 5 seconds
                     const intervalId = setInterval(() => {
                         this.captureImage();
-                        countdownText.innerText = Math.round((coundown - 1) / 2) + " seconds...";
+                        countdownText.innerText = Math.round((coundown - 1) / 8) + " seconds...";
                         coundown--;
-                    }, 500);
+                    }, 1000);
 
 
                     // Stop sampling process after 5 seconds
@@ -420,9 +420,9 @@ class Overlay extends React.Component {
                     // Execute captureImage every 0.5 seconds for 5 seconds
                     const intervalId = setInterval(() => {
                         this.captureImage();
-                        countdownText.innerText = Math.round((coundown - 1) / 2) + " seconds...";
+                        countdownText.innerText = Math.round((coundown - 1) / 8) + " seconds...";
                         coundown--;
-                    }, 500);
+                    }, 1000);
 
 
                     // Stop sampling process after 5 seconds
@@ -453,9 +453,9 @@ class Overlay extends React.Component {
                     // Execute captureImage every 0.5 seconds for 5 seconds
                     const intervalId = setInterval(() => {
                         this.captureImage();
-                        countdownText.innerText = Math.round((coundown - 1) / 2) + " seconds...";
+                        countdownText.innerText = Math.round((coundown - 1) / 8) + " seconds...";
                         coundown--;
-                    }, 500);
+                    }, 1000);
 
 
                     // Stop sampling process after 5 seconds
@@ -487,9 +487,9 @@ class Overlay extends React.Component {
                     // Execute captureImage every 0.5 seconds for 5 seconds
                     const intervalId = setInterval(() => {
                         this.captureImage();
-                        countdownText.innerText = Math.round((coundown - 1) / 2) + " seconds...";
+                        countdownText.innerText = Math.round((coundown - 1) / 8) + " seconds...";
                         coundown--;
-                    }, 500);
+                    }, 1000);
 
 
                     // Stop sampling process after 5 seconds

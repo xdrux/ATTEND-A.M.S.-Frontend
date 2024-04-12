@@ -154,8 +154,9 @@ class ExportClass extends React.Component {
                             const date = attendance.date;
                             let isPresent = attendance.isPresent;
 
+
                             if (!attendanceMap.has(studentName)) {
-                                attendanceMap.set(studentName, { "Number of Absences": 0, "Number of Lates": 0 });
+                                attendanceMap.set(studentName, { "Number of Absences": 0, "Number of Lates": 0, "Number of Presents": 0 });
                             }
 
                             // Count absences and lates for the day
@@ -163,6 +164,8 @@ class ExportClass extends React.Component {
                                 attendanceMap.get(studentName)["Number of Lates"]++;
                             } else if (isPresent.toLowerCase() === "absent") {
                                 attendanceMap.get(studentName)["Number of Absences"]++;
+                            } else if (isPresent.toLowerCase() === "present") {
+                                attendanceMap.get(studentName)["Number of Presents"]++;
                             }
 
                             if (!attendanceMap.get(studentName)[date]) {
@@ -171,28 +174,38 @@ class ExportClass extends React.Component {
 
                             // Update totals for each day
                             if (!totals[date]) {
-                                totals[date] = { absences: 0, lates: 0 };
+                                totals[date] = { absences: 0, lates: 0, presents: 0 };
                             }
 
                             if (isPresent.toLowerCase() === "late") {
                                 totals[date].lates++;
                             } else if (isPresent.toLowerCase() === "absent") {
                                 totals[date].absences++;
+                            } else if (isPresent.toLowerCase() === "present") {
+                                totals[date].presents++;
+                            }
+
+                            if (this.isFutureDate(date)) {
+                                // Set totals to empty string for future dates
+                                totals[date].lates = "";
+                                totals[date].absences = "";
+                                totals[date].presents = "";
                             }
                         });
                     });
 
                     // Create header row with dates and additional columns for absences and lates
-                    const headerRow = ['Student Name', 'Number of Absences', 'Number of Lates', ...Array.from(attendanceMap.values())[0] ? Object.keys(Array.from(attendanceMap.values())[0]).filter(date => date !== "Number of Lates" && date !== "Number of Absences") : []];
+                    const headerRow = ['Student Name', 'Number of Absences', 'Number of Lates', 'Number of Presents', ...Array.from(attendanceMap.values())[0] ? Object.keys(Array.from(attendanceMap.values())[0]).filter(date => date !== "Number of Lates" && date !== "Number of Absences" && date !== "Number of Presents") : []];
 
                     xlsx.utils.sheet_add_aoa(ws, [headerRow], { origin: -1 });
 
                     // Populate the worksheet with student data
                     let row = 1;
                     attendanceMap.forEach((attendance, studentName) => {
-                        const rowData = [studentName, attendance["Number of Absences"], attendance["Number of Lates"]];
+                        const rowData = [studentName, attendance["Number of Absences"], attendance["Number of Lates"], attendance["Number of Presents"]];
                         Object.keys(attendance).forEach(date => {
-                            if (date !== "Number of Lates" && date !== "Number of Absences") {
+                            if (date !== "Number of Lates" && date !== "Number of Absences" && date !== "Number of Presents") {
+                                console.log(date);
                                 rowData.push(attendance[date]);
                             }
                         });
@@ -202,16 +215,18 @@ class ExportClass extends React.Component {
 
                     // Add additional rows for total number of absences and lates for each day
                     const spaceRow = [];
-                    const absencesRow = ["Number of Absences", "", "", ...Object.keys(totals).map(date => totals[date].absences)];
-                    const latesRow = ["Number of Lates", "", "", ...Object.keys(totals).map(date => totals[date].lates)];
+                    const absencesRow = ["Number of Absences", "", "", "", ...Object.keys(totals).map(date => totals[date].absences)];
+                    const latesRow = ["Number of Lates", "", "", "", ...Object.keys(totals).map(date => totals[date].lates)];
+                    const presentsRow = ["Number of Presents", "", "", "", ...Object.keys(totals).map(date => totals[date].presents)];
 
                     xlsx.utils.sheet_add_aoa(ws, [spaceRow], { origin: -1 });
                     xlsx.utils.sheet_add_aoa(ws, [absencesRow], { origin: -1 });
                     xlsx.utils.sheet_add_aoa(ws, [latesRow], { origin: -1 });
+                    xlsx.utils.sheet_add_aoa(ws, [presentsRow], { origin: -1 });
 
 
                     // Apply default cell style to the entire worksheet
-                    ws['!cols'] = [{ width: 25 }, { width: 15 }, { width: 15 }, ...Array(headerRow.length - 3).fill({ width: 12 })]; // Setting column widths for better readability
+                    ws['!cols'] = [{ width: 25 }, { width: 15 }, { width: 15 }, { width: 15 }, ...Array(headerRow.length - 3).fill({ width: 12 })]; // Setting column widths for better readability
 
 
 
