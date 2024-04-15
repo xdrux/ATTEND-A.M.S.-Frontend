@@ -294,7 +294,7 @@ class ScanningPage extends React.Component {
                 scanBarcodeText.innerText = "Use Barcode"
                 scanPhotoButton.style.visibility = "visible";
                 ctx.clearRect(0, 0, canvRefLoc.width, canvRefLoc.height);
-                infoContent.innerText = "Keep a neutral face in the box";
+                infoContent.innerText = "Ensure that the face fully occupies the box";
                 this.drawRectangle();
                 // window.location.reload()
             } else {

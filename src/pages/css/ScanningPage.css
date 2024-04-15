@@ -20,7 +20,7 @@
 
 #infoContainer {
     position: absolute;
-    top: 24vh;
+    top: 23vh;
     margin-left: 5vw;
     width: 45vw;
     height: 5vh;
@@ -28,6 +28,7 @@
     align-items: center;
     justify-content: center;
     z-index: 1;
+    background-color: white;
 }
 
 #infoContent {

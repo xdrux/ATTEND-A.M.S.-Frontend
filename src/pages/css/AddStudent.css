@@ -15,3 +15,7 @@
     top: 21vh;
     left: 42.5vw;
 }
+
+#overlayClassMainHeader {
+    display: flex;
+}

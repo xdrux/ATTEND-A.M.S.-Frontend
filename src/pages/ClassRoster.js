@@ -29,7 +29,8 @@ class ClassRoster extends React.Component {
             loading: false,
             isEditClicked: false,
             isViewClicked: false,
-            studentClicked: null
+            studentClicked: null,
+            isClassClicked: false
         };
     }
 
@@ -116,8 +117,13 @@ class ClassRoster extends React.Component {
 
     }
 
-    handleTrashDeleteClick = (student) => {
+    handleClassClick = () => {
+        this.setState({ isClassClicked: true });
+    }
+
+    handleTrashDeleteClick = (student, e) => {
         console.log(student);
+        e.stopPropagation();
 
         const body = {
             courseYear: this.props.classId,
@@ -195,7 +201,7 @@ class ClassRoster extends React.Component {
     };
 
     hideOverlay = () => {
-        this.setState({ isDeleteAllClicked: false });
+        this.setState({ isDeleteAllClicked: false, isClassClicked: false });
     };
 
     handleOverlayData = (data) => {
@@ -260,7 +266,7 @@ class ClassRoster extends React.Component {
     };
 
     render() {
-        const { isLoggedIn, isAddStudentClicked, students, isDeleteAllClicked, loading, classInfo, isViewClicked, isEditClicked, studentClicked } = this.state;
+        const { isLoggedIn, isAddStudentClicked, isClassClicked, students, isDeleteAllClicked, loading, classInfo, isViewClicked, isEditClicked, studentClicked } = this.state;
         const loadingColor = 'rgb(123, 17, 19)';
 
         if (isLoggedIn === false) {
@@ -301,7 +307,7 @@ class ClassRoster extends React.Component {
                             {this.state.back ? (<Navigate to="/Register/MyClasses" />) :
                                 (<img onClick={this.handleBackClick} className="BackIcon" src={backIcon} alt="back" />)
                             }
-                            <div className="HeaderText">
+                            <div className="HeaderText" onClick={this.handleClassClick}>
                                 <p>{classInfo.courseNameSection}</p>
                                 <p className="rosterBelowHeader">{classInfo.semester} {classInfo.acadYear}</p>
                             </div>
@@ -326,7 +332,7 @@ class ClassRoster extends React.Component {
                                                         <p className="rosterStudName">{student}</p>
                                                         <div>
                                                             <img id={index.toString() + "_edit"} onClick={(e) => this.handleEditClick(student, e)} className="trashIcon" src={editIcon} alt="edit" />
-                                                            <img id={index} onClick={() => this.handleTrashDeleteClick(student)} className="trashIcon" src={trash} alt="trash" />
+                                                            <img id={index} onClick={(e) => this.handleTrashDeleteClick(student, e)} className="trashIcon" src={trash} alt="trash" />
                                                         </div>
                                                         {/* <img id={index} onClick={() => this.handleTrashDeleteClick(student)} className="trashIcon" src={trash} alt="trash" /> */}
                                                     </div>
@@ -345,6 +351,10 @@ class ClassRoster extends React.Component {
 
                 {isDeleteAllClicked && (
                     <BigDeleteOverlay onDataSubmit={this.handleOverlayData} onClose={this.hideOverlay} />
+                )}
+
+                {isClassClicked && (
+                    <ClassInfoOverlay onDataSubmit={this.handleOverlayData} onClose={this.hideOverlay} data={classInfo} />
                 )}
             </div >
         );
@@ -393,6 +403,67 @@ class BigDeleteOverlay extends React.Component {
                         <div className="deleteOButton" onClick={this.handleWholeClassClick}><p>Entire class</p></div>
                         <div className="deleteOButton" onClick={this.handleAllStudentsClick}><p>All the students</p></div>
                         <div className="deleteOButton" onClick={this.handleNothingClick}><p>None</p></div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}
+
+class ClassInfoOverlay extends React.Component {
+    handleSubmit = () => {
+        this.props.onDataSubmit(this.state.inputData);
+        this.setState({ inputData: '' });
+        this.props.onClose();
+    };
+
+    handleBackClick = () => {
+        this.props.onClose();
+    }
+
+
+    render() {
+        console.log(this.props.data)
+        const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const sched = this.props.data.courseSchedule.map(function (num) {
+            return weekdays[num];
+        });
+
+        return (
+            <div className="overlay">
+                <div className="overlayClassInfo">
+                    <div id="overlayBackContainer">
+                        <img onClick={this.handleBackClick} id="overlayBackIcon" src={backIcon} alt="back" />
+                    </div>
+
+                    <div id="overlayClassInfoHeader">
+                        <p id="overlayHeader1">{this.props.data.courseCode}: {this.props.data.courseName}</p>
+                        <p id="overlayHeader2">{this.props.data.semester} {this.props.data.acadYear}</p>
+                        <p id="overlayHeader3">{this.props.data.courseSection}</p>
+                    </div>
+                    <div id="overlayClassInfoContent">
+                        <div className="overlayClassContentDiv">
+                            <p>Type:</p>
+                            <p>Instructor:</p>
+                            <p>Class Start/End Date:</p>
+                            <p>Class Schedule:</p>
+                            <p>Class Period:</p>
+                            <p>Grace Period:</p>
+                        </div>
+                        <div className="overlayClassContentDiv">
+                            <p>{this.props.data.classType}</p>
+                            <p>{this.props.data.instructor}</p>
+                            <p>{new Date(this.props.data.courseStartDate).toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "2-digit" }).replace(/\//g, '/')} - {new Date(this.props.data.courseEndDate).toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "2-digit" }).replace(/\//g, '/')}</p>
+                            <p>{sched.join(", ")}</p>
+                            <p>{this.props.data.courseStartTime} - {this.props.data.courseEndTime}</p>
+                            <p>{this.props.data.gracePeriod} minutes</p>
+                        </div>
+                        {/* <p>Type: {this.props.data.classType}</p>
+                        <p>Instructor: {this.props.data.instructor}</p>
+                        <p>Class Start/End Date: {new Date(this.props.data.courseStartDate).toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "2-digit" }).replace(/\//g, '/')} - {new Date(this.props.data.courseEndDate).toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "2-digit" }).replace(/\//g, '/')}</p>
+                        <p>Class Schedule: {sched.join(", ")}</p>
+                        <p>Class Period: {this.props.data.courseStartTime} - {this.props.data.courseEndTime}</p>
+                        <p>Grace Period: {this.props.data.gracePeriod} minutes</p> */}
                     </div>
                 </div>
             </div>
