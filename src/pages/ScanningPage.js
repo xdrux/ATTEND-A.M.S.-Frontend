@@ -200,66 +200,79 @@ class ScanningPage extends React.Component {
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
-                    const currentDate = new Date();
+                    if (data.confidence_score < 30) {
+                        this.setState({
+                            dataForOverlay: {
+                                result: "failed",
+                                message: "Failed to recognize face",
+                            },
+                        }, () => {
+                            // This callback will execute after the state has been updated
+                            this.setState({ openOverlay: true, loading: false });
+                        })
+                    } else {
+                        const currentDate = new Date();
 
-                    // Get the formatted date string
-                    const formattedDateString = currentDate.toDateString();
+                        // Get the formatted date string
+                        const formattedDateString = currentDate.toDateString();
 
-                    const currentDate2 = new Date();
+                        const currentDate2 = new Date();
 
-                    // Get the current hours and minutes
-                    const currentHours = String(currentDate2.getHours()).padStart(2, '0');
-                    const currentMinutes = String(currentDate2.getMinutes()).padStart(2, '0');
+                        // Get the current hours and minutes
+                        const currentHours = String(currentDate2.getHours()).padStart(2, '0');
+                        const currentMinutes = String(currentDate2.getMinutes()).padStart(2, '0');
 
-                    // Format the time as HH:MM
-                    const currentTime = `${currentHours}:${currentMinutes}`;
-                    const attendanceData = {
-                        studentNumber: data.predicted_face,
-                        dateToday: formattedDateString,
-                        timeIn: currentTime,
-                        courseYear: this.props.classId
+                        // Format the time as HH:MM
+                        const currentTime = `${currentHours}:${currentMinutes}`;
+                        const attendanceData = {
+                            studentNumber: data.predicted_face,
+                            dateToday: formattedDateString,
+                            timeIn: currentTime,
+                            courseYear: this.props.classId
+                        }
+
+                        console.log(attendanceData);
+
+                        fetch(
+                            "http://localhost:3001/logAttendance",
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(attendanceData)
+                            }).then(response => response.json())
+                            .then(body => {
+                                console.log(body);
+                                if (body.status === "success") {
+                                    this.setState({
+                                        dataForOverlay: {
+                                            result: "success",
+                                            studentName: body.identity,
+                                            studentNumber: attendanceData.studentNumber,
+                                            time: attendanceData.timeIn,
+                                            message: "",
+                                            courseYear: this.props.classId,
+                                            oldRecord: body.oldRecord
+                                        }
+                                    }, () => {
+                                        // This callback will execute after the state has been updated
+                                        this.setState({ openOverlay: true, loading: false });
+                                    });
+                                } else {
+                                    this.setState({
+                                        dataForOverlay: {
+                                            result: "failed",
+                                            message: body.message,
+                                        },
+                                    }, () => {
+                                        // This callback will execute after the state has been updated
+                                        this.setState({ openOverlay: true, loading: false });
+                                    })
+                                }
+                            });
                     }
 
-                    console.log(attendanceData);
-
-                    fetch(
-                        "http://localhost:3001/logAttendance",
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify(attendanceData)
-                        }).then(response => response.json())
-                        .then(body => {
-                            console.log(body);
-                            if (body.status === "success") {
-                                this.setState({
-                                    dataForOverlay: {
-                                        result: "success",
-                                        studentName: body.identity,
-                                        studentNumber: attendanceData.studentNumber,
-                                        time: attendanceData.timeIn,
-                                        message: "",
-                                        courseYear: this.props.classId,
-                                        oldRecord: body.oldRecord
-                                    }
-                                }, () => {
-                                    // This callback will execute after the state has been updated
-                                    this.setState({ openOverlay: true, loading: false });
-                                });
-                            } else {
-                                this.setState({
-                                    dataForOverlay: {
-                                        result: "failed",
-                                        message: body.message,
-                                    },
-                                }, () => {
-                                    // This callback will execute after the state has been updated
-                                    this.setState({ openOverlay: true, loading: false });
-                                })
-                            }
-                        });
 
                     // Handle response from server if needed
                 })
