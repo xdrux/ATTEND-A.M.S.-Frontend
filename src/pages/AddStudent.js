@@ -1,6 +1,7 @@
 import React from "react";
 import { useParams } from 'react-router-dom';
 import './css/common.css';
+import faceOutline from './../assets/faceOutline.png';
 import backIcon from './../assets/back.png'
 import logo from './../assets/appLogo.png';
 import faceFront from './../assets/faceFront.jpg';
@@ -599,6 +600,16 @@ class Overlay extends React.Component {
         ctx.lineWidth = 4;
         ctx.strokeStyle = 'white';
         ctx.stroke();
+
+        this.faceOutlineImg = new Image();
+        this.faceOutlineImg.src = faceOutline;
+
+        const canvas2 = this.canvasRef.current;
+        const ctx2 = canvas2.getContext('2d');
+        console.log(this.faceOutlineImg.width)
+        this.faceOutlineImg.onload = () => {
+            ctx2.drawImage(this.faceOutlineImg, 198, 80, 300 * (this.faceOutlineImg.width / this.faceOutlineImg.height), 300); // Adjust x, y, width, height as needed
+        };
     }
 
     handleSubmit = () => {

@@ -4,7 +4,7 @@ import './css/common.css';
 import './css/ClassRoster.css';
 import './css/ScanningPage.css';
 import './css/ScanResult.css';
-
+import faceOutline from './../assets/faceOutline.png';
 import backIcon from './../assets/back.png'
 import checkIcon from './../assets/checkIcon.png';
 import xIcon from './../assets/xIcon.png';
@@ -171,6 +171,17 @@ class ScanningPage extends React.Component {
         ctx.lineWidth = 4;
         ctx.strokeStyle = 'white';
         ctx.stroke();
+
+        this.faceOutlineImg = new Image();
+        this.faceOutlineImg.src = faceOutline;
+
+        const canvas2 = this.canvasRef.current;
+        const ctx2 = canvas2.getContext('2d');
+        console.log(this.faceOutlineImg.width)
+        this.faceOutlineImg.onload = () => {
+            ctx2.drawImage(this.faceOutlineImg, 198, 80, 300 * (this.faceOutlineImg.width / this.faceOutlineImg.height), 300); // Adjust x, y, width, height as needed
+        };
+
     }
 
     captureImage = () => {
@@ -185,6 +196,8 @@ class ScanningPage extends React.Component {
         croppedCanvas.width = 300;
         croppedCanvas.height = 300;
         croppedCtx.putImageData(imageData, 0, 0);
+
+        console.log(croppedCanvas.toDataURL())
 
         // Convert the cropped canvas to a Blob (image file)
         croppedCanvas.toBlob(blob => {
@@ -485,6 +498,7 @@ class ScanningPage extends React.Component {
                             ))}
                         </select>
                         {/* Webcam component with selected video source */}
+
                         <div>
                             <Webcam
                                 id="videoStreamScan"
@@ -499,6 +513,10 @@ class ScanningPage extends React.Component {
                             />
                             <canvas id="canvasPhotoScan" ref={this.canvasRef} width={640} height={480}></canvas>
                         </div>
+                        {/* <div className="faceOutlineContainer">
+                            <img className="faceOutline" src={faceOutline}></img>
+                        </div> */}
+
                         <div id="scanRightSideContainer">
                             <div id="dateTimeContainer">
                                 <p id="timeContainer" className="datetimeContent">{this.state.currentTime}</p>

@@ -291,3 +291,21 @@ p {
 .hidden {
     display: none;
 }
+
+.faceOutlineContainer {
+    position: absolute;
+    top: 23vh;
+    left: 5vw;
+    width: 45vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 54vh;
+}
+
+.faceOutline {
+    /* position: absolute; */
+    margin-top: 13vh;
+    height: 43vh;
+
+}
