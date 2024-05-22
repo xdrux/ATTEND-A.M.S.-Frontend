@@ -645,9 +645,8 @@ class Overlay extends React.Component {
     // };
 
     drawRectangle() {
-        const element = document.getElementById('videoStream');
-        const rect = element.getBoundingClientRect();
         const canvRefLoc = document.getElementById('canvasPhoto');
+        // canvRefLoc.style.backgroundColor = "green";
         canvRefLoc.style.position = 'absolute';
         canvRefLoc.style.top = 21 + "vh";
         canvRefLoc.style.left = 10 + "vw";

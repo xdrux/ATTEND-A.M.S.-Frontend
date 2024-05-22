@@ -151,8 +151,6 @@ class ScanningPage extends React.Component {
     };
 
     drawRectangle() {
-        const element = document.getElementById('videoStreamScan');
-        const rect = element.getBoundingClientRect();
         const canvRefLoc = document.getElementById('canvasPhotoScan');
         canvRefLoc.style.position = 'absolute';
         canvRefLoc.style.top = 23 + "vh";
@@ -419,8 +417,6 @@ class ScanningPage extends React.Component {
     };
 
     drawRectangleBarcode() {
-        const element = document.getElementById('videoStreamScan');
-        const rect = element.getBoundingClientRect();
         const canvRefLoc = document.getElementById('canvasPhotoScan');
         // canvRefLoc.style.backgroundColor = "green";
         canvRefLoc.style.position = 'absolute';

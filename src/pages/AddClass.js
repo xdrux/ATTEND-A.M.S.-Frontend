@@ -63,7 +63,7 @@ class AddClass extends React.Component {
 
     // validates the user input
     validateForm = () => {
-        const { courseName, courseCode, classSection, gracePeriod, semester, acadYear, classType, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
+        const { courseName, courseCode, classSection, gracePeriod, semester, acadYear, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
         var errors = "";
         var isComplete = true;
 
