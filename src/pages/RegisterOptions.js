@@ -5,6 +5,7 @@ import backIcon from './../assets/back.png'
 import logo from './../assets/appLogo.png';
 import { Navigate } from "react-router-dom";
 
+// register options component
 class RegisterOptions extends React.Component {
     constructor(props) {
         super(props);
@@ -29,7 +30,6 @@ class RegisterOptions extends React.Component {
             })
             .then(response => response.json())
             .then(body => {
-                console.log(body)
                 if (body.isLoggedIn) {
                     this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
                 } else {

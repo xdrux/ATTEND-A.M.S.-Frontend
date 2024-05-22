@@ -8,9 +8,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { toast } from 'react-toastify';
 import Dropdown from 'react-dropdown';
-// import 'react-dropdown/style.css'; // Import the CSS for react-dropdown
 
-
+// Add Class component
 class AddClass extends React.Component {
     constructor(props) {
         super(props);
@@ -39,12 +38,9 @@ class AddClass extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.state.classType)
-        // console.log(localStorage.getItem('useremail'))
         // Set isActive to true after a short delay to trigger the fade-in effect
         this.timeout = setTimeout(() => {
             this.setState({ isActive: true });
-            console.log(document.cookie)
             fetch("http://localhost:3001/checkIfLoggedIn",
                 {
                     method: "POST",
@@ -52,7 +48,6 @@ class AddClass extends React.Component {
                 })
                 .then(response => response.json())
                 .then(body => {
-                    console.log(body)
                     if (body.isLoggedIn) {
                         this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
                     } else {
@@ -66,10 +61,9 @@ class AddClass extends React.Component {
         clearTimeout(this.timeout); // Clear the timeout on component unmount
     }
 
-
+    // validates the user input
     validateForm = () => {
         const { courseName, courseCode, classSection, gracePeriod, semester, acadYear, classType, selectedStartDate, selectedEndDate, selectedStartTime, selectedEndTime, selectedWeekdays } = this.state;
-        console.log(semester, acadYear, classType)
         var errors = "";
         var isComplete = true;
 
@@ -164,7 +158,6 @@ class AddClass extends React.Component {
                 courseEndTime: selectedEndTime,
                 instructor: localStorage.getItem('useremail')
             }
-            console.log(course)
             fetch(
                 "http://localhost:3001/AddCourse",
                 {
@@ -175,7 +168,6 @@ class AddClass extends React.Component {
                     body: JSON.stringify(course)
                 }).then(response => response.json())
                 .then(body => {
-                    console.log(body);
                     toast.success('Class Saved!', {
                         position: "bottom-right",
                         autoClose: 5000,
@@ -221,7 +213,6 @@ class AddClass extends React.Component {
 
     handleTypeChange = selectedOption => {
         this.setState({ classType: selectedOption.value });
-        console.log(selectedOption.label)
     };
 
     handleStartDateChange = (date) => {
@@ -397,20 +388,6 @@ class AddClass extends React.Component {
 
                             <p id='e-courseCode' className='S-Error'></p>
                         </div>
-                        {/* <div className="formItem">
-                            <label className="FormLabel" htmlFor="acadYear">Academic Year</label>
-                            <input
-                                type="text"
-                                name="acadYear"
-                                className="FormTextArea"
-                                id="acadYear"
-                                value={acadYear}
-                                onChange={this.handleAcadYearChange}
-                                required
-                            />
-                            <p id='e-courseCode' className='S-Error'></p>
-                        </div> */}
-
                         <div className="formItem">
                             <p className="FormLabel">Class Schedule</p>
                             <div className="checkbox-container">

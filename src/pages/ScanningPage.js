@@ -13,13 +13,9 @@ import { Navigate } from "react-router-dom";
 import { BrowserBarcodeReader } from '@zxing/library';
 import ReactLoading from 'react-loading';
 import { toast } from 'react-toastify';
-
-
-// import { toast } from 'react-toastify';
-
 import Webcam from 'react-webcam';
 
-
+// scanning component
 class ScanningPage extends React.Component {
     constructor(props) {
         super(props);
@@ -67,7 +63,6 @@ class ScanningPage extends React.Component {
             })
             .then(response => response.json())
             .then(body => {
-                console.log(body)
                 if (body.isLoggedIn) {
                     this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
                 } else {
@@ -152,14 +147,12 @@ class ScanningPage extends React.Component {
     };
 
     handleOverlayData = (data) => {
-        console.log('Data from overlay:', data);
         this.hideOverlay();
     };
 
     drawRectangle() {
         const element = document.getElementById('videoStreamScan');
         const rect = element.getBoundingClientRect();
-        console.log('Element position (relative to viewport):', rect.top, rect.left);
         const canvRefLoc = document.getElementById('canvasPhotoScan');
         canvRefLoc.style.position = 'absolute';
         canvRefLoc.style.top = 23 + "vh";
@@ -177,7 +170,6 @@ class ScanningPage extends React.Component {
 
         const canvas2 = this.canvasRef.current;
         const ctx2 = canvas2.getContext('2d');
-        console.log(this.faceOutlineImg.width)
         this.faceOutlineImg.onload = () => {
             ctx2.drawImage(this.faceOutlineImg, 198, 80, 300 * (this.faceOutlineImg.width / this.faceOutlineImg.height), 300); // Adjust x, y, width, height as needed
         };
@@ -197,8 +189,6 @@ class ScanningPage extends React.Component {
         croppedCanvas.height = 300;
         croppedCtx.putImageData(imageData, 0, 0);
 
-        console.log(croppedCanvas.toDataURL())
-
         // Convert the cropped canvas to a Blob (image file)
         croppedCanvas.toBlob(blob => {
             // Create FormData and append the image file and filename
@@ -212,7 +202,6 @@ class ScanningPage extends React.Component {
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     if (data.confidence_score < 30) {
                         this.setState({
                             dataForOverlay: {
@@ -244,8 +233,6 @@ class ScanningPage extends React.Component {
                             courseYear: this.props.classId
                         }
 
-                        console.log(attendanceData);
-
                         fetch(
                             "http://localhost:3001/logAttendance",
                             {
@@ -256,7 +243,6 @@ class ScanningPage extends React.Component {
                                 body: JSON.stringify(attendanceData)
                             }).then(response => response.json())
                             .then(body => {
-                                console.log(body);
                                 if (body.status === "success") {
                                     this.setState({
                                         dataForOverlay: {
@@ -305,7 +291,6 @@ class ScanningPage extends React.Component {
         const { scanningBarcode } = this.state;
         this.setState({ isBarcodeActive: !this.state.isBarcodeActive }, async () => {
             const { isBarcodeActive } = this.state;
-            console.log(isBarcodeActive);
 
             const codeReader = new BrowserBarcodeReader();
             const webcam = this.webcamRef.current.video;
@@ -339,10 +324,8 @@ class ScanningPage extends React.Component {
                     this.drawRectangleBarcode();
                     infoContent.innerText = "Waiting for the barcode to be scanned"
                     webcam.pause();
-                    console.log('Attempting barcode scanning...');
                     try {
                         const result = await codeReader.decodeFromVideoElement(webcam, this.handleBarcodeResult);
-                        console.log('Barcode result1:', result.text);
                         this.setState({ loading: true });
 
                         let studNum = result.text;
@@ -373,8 +356,6 @@ class ScanningPage extends React.Component {
                             courseYear: this.props.classId
                         }
 
-                        console.log(attendanceData);
-
                         fetch(
                             "http://localhost:3001/logAttendance",
                             {
@@ -385,7 +366,6 @@ class ScanningPage extends React.Component {
                                 body: JSON.stringify(attendanceData)
                             }).then(response => response.json())
                             .then(body => {
-                                console.log(body);
                                 if (body.status === "success") {
                                     this.setState({
                                         dataForOverlay: {
@@ -416,7 +396,6 @@ class ScanningPage extends React.Component {
 
                         // Do something with the barcode result, such as updating state
                     } catch (error) {
-                        console.error('Barcode scanning error:', error);
                     } finally {
                         webcam.play();
                         scanBarcodeText.innerText = "Use Barcode"
@@ -442,7 +421,6 @@ class ScanningPage extends React.Component {
     drawRectangleBarcode() {
         const element = document.getElementById('videoStreamScan');
         const rect = element.getBoundingClientRect();
-        console.log('Element position (relative to viewport):', rect.top, rect.left);
         const canvRefLoc = document.getElementById('canvasPhotoScan');
         // canvRefLoc.style.backgroundColor = "green";
         canvRefLoc.style.position = 'absolute';
@@ -638,7 +616,6 @@ class BigDeleteOverlay extends React.Component {
                 body: JSON.stringify(studentData)
             }).then(response => response.json())
             .then(body => {
-                console.log(body);
                 if (body.status === "success") {
                     toast.success('Attendance Reversed!', {
                         position: "bottom-right",
@@ -671,7 +648,6 @@ class BigDeleteOverlay extends React.Component {
 
     render() {
         const { dataFromScanningPage } = this.props;
-        console.log(dataFromScanningPage)
         let hour = "";
         if (dataFromScanningPage.result !== "failed") {
             const [hours, minutes] = dataFromScanningPage.time.split(':');

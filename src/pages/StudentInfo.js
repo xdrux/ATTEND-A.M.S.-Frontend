@@ -17,6 +17,7 @@ import { toast } from 'react-toastify';
 import Webcam from 'react-webcam';
 import { Stepper } from 'react-form-stepper';
 
+//Student info component
 class StudentInfo extends React.Component {
     constructor(props) {
         super(props);
@@ -37,7 +38,6 @@ class StudentInfo extends React.Component {
         // Set isActive to true after a short delay to trigger the fade-in effect
         this.timeout = setTimeout(() => {
             this.setState({ isActive: true });
-            console.log(document.cookie)
             fetch("http://localhost:3001/checkIfLoggedIn",
                 {
                     method: "POST",
@@ -45,7 +45,6 @@ class StudentInfo extends React.Component {
                 })
                 .then(response => response.json())
                 .then(body => {
-                    console.log(body)
                     if (body.isLoggedIn) {
                         this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
                         fetch("http://localhost:3001/getStudentInfo",
@@ -58,7 +57,6 @@ class StudentInfo extends React.Component {
                             })
                             .then(response => response.json())
                             .then(body => {
-                                // console.log(body)
                                 this.setState({
                                     studentNumber: (body.studentNumber).toString(), firstName: body.firstName,
                                     lastName: body.lastName,
@@ -95,7 +93,6 @@ class StudentInfo extends React.Component {
         const faceSamplesElement = document.getElementById("addSamplesBlock");
         const textAreas = document.getElementsByClassName("FormTextArea");
         const editButton = document.getElementById("editSaveButton");
-        console.log(textAreas)
 
         faceSamplesElement.classList.add("formItem")
         faceSamplesElement.classList.add("hidden")
@@ -142,7 +139,6 @@ class StudentInfo extends React.Component {
     };
 
     handleOverlayData = (data) => {
-        console.log('Data from overlay:', data);
         this.setState({ faceSamples: data });
         this.hideOverlay();
         const fSampleText = document.getElementById("addFSampleText");
@@ -151,7 +147,6 @@ class StudentInfo extends React.Component {
 
     validateForm = () => {
         const { studentNumber, firstName, lastName, faceSamples } = this.state;
-        console.log(studentNumber)
         var errors = "";
         var isComplete = true;
         if (studentNumber.trim().length !== 9 || /^\d+$/.test(studentNumber) === false || firstName.trim().length === 0 || lastName.trim().length === 0 || faceSamples.length === 0) {
@@ -199,7 +194,6 @@ class StudentInfo extends React.Component {
                     body: JSON.stringify(student)
                 }).then(response => response.json())
                 .then(body => {
-                    console.log(body);
                     if (body.success) {
                         toast.success('Student Updated!', {
                             position: "bottom-right",
@@ -239,7 +233,6 @@ class StudentInfo extends React.Component {
         const { isLoggedIn, studentNumber, firstName, lastName, middleName, isOverlayVisible, back } = this.state;
         if (back) {
             const url = `/Register/MyClasses/ClassRoster/${this.props.classId}`;
-            console.log(url);
             return <Navigate to={url} replace />;
         }
 
@@ -339,7 +332,6 @@ class StudentInfo extends React.Component {
 
 const StudentInfoWraper = () => {
     const { classId, student, action } = useParams();
-    console.log(classId, student, action)
 
     return <StudentInfo classId={classId} student={student} action={action} />;
 };
@@ -398,7 +390,6 @@ class Overlay extends React.Component {
         const base64String = croppedCanvas.toDataURL('image/jpeg');
         inputData.push(base64String);
         this.setState({ inputData: inputData });
-        console.log(inputData.length);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         this.drawRectangle();
     };
@@ -570,8 +561,7 @@ class Overlay extends React.Component {
                         countdownText.innerText = "";
                         startButton.style.visibility = "visible";
                         backButton.style.visibility = "visible";
-                        // samplingPic.src = faceDown;
-                        console.log(this.state.inputData)
+
 
                         this.props.onDataSubmit(this.state.inputData);
 
@@ -657,9 +647,7 @@ class Overlay extends React.Component {
     drawRectangle() {
         const element = document.getElementById('videoStream');
         const rect = element.getBoundingClientRect();
-        console.log('Element position (relative to viewport):', rect.top, rect.left);
         const canvRefLoc = document.getElementById('canvasPhoto');
-        // canvRefLoc.style.backgroundColor = "green";
         canvRefLoc.style.position = 'absolute';
         canvRefLoc.style.top = 21 + "vh";
         canvRefLoc.style.left = 10 + "vw";

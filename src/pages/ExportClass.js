@@ -7,6 +7,7 @@ import { Navigate } from "react-router-dom";
 import ReactLoading from 'react-loading';
 import * as xlsx from 'xlsx';
 
+// export class component
 class ExportClass extends React.Component {
     constructor(props) {
         super(props);
@@ -35,7 +36,6 @@ class ExportClass extends React.Component {
             });
 
             const loggedInBody = await loggedInResponse.json();
-            console.log(loggedInBody);
 
             if (loggedInBody.isLoggedIn) {
                 // Proceed with other fetches only if logged in
@@ -108,7 +108,6 @@ class ExportClass extends React.Component {
 
     handleClassClick = (clickedClass) => {
         this.setState({ loading: true });
-        console.log("Clicked class:", clickedClass);
         const section = {
             courseYear: clickedClass
         }
@@ -122,7 +121,6 @@ class ExportClass extends React.Component {
                 body: JSON.stringify(section)
             }).then(response => response.json())
             .then(students => {
-                console.log(students)
                 students.forEach(item => {
                     item.attendanceData.forEach(attendance => {
                         attendance.date = this.formatDate(attendance.date);
@@ -205,7 +203,6 @@ class ExportClass extends React.Component {
                         const rowData = [studentName, attendance["Number of Absences"], attendance["Number of Lates"], attendance["Number of Presents"]];
                         Object.keys(attendance).forEach(date => {
                             if (date !== "Number of Lates" && date !== "Number of Absences" && date !== "Number of Presents") {
-                                console.log(date);
                                 rowData.push(attendance[date]);
                             }
                         });
@@ -257,7 +254,6 @@ class ExportClass extends React.Component {
 
     createClasses() {
         const { classes, classInfo } = this.state;
-        console.log(classInfo)
         var classCounter = 0;
         var divElement = `<div class="classesBlock">`;
         var wrapper = `<div class= "classMainBlock">`;
@@ -276,7 +272,6 @@ class ExportClass extends React.Component {
                 wrapper += divElement;
                 wrapper += "</div>";
             } else if ((classCounter + 1) % 3 === 0) {
-                // console.log("huhu")
                 divElement += "</div>";
                 wrapper += divElement;
                 divElement = `<div class="classesBlock">`;
@@ -285,12 +280,10 @@ class ExportClass extends React.Component {
             classCounter++;
         }
 
-        console.log(wrapper);
         document.getElementById("classList").innerHTML = wrapper;
 
         const clickableElements = document.getElementsByClassName("clickable");
         for (let i = 0; i < clickableElements.length; i++) {
-            console.log(i)
             clickableElements[i].addEventListener("click", (event) => {
                 this.handleClassClick(clickableElements[i].id);
             });

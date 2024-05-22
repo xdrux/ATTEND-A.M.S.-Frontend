@@ -5,6 +5,7 @@ import backIcon from './../assets/back.png'
 import logo from './../assets/appLogo.png';
 import { Navigate } from "react-router-dom";
 
+// scannable classes component
 class ScannableClasses extends React.Component {
     constructor(props) {
         super(props);
@@ -32,27 +33,25 @@ class ScannableClasses extends React.Component {
             });
 
             const loggedInBody = await loggedInResponse.json();
-            console.log(loggedInBody);
 
             if (loggedInBody.isLoggedIn) {
                 // Proceed with other fetches only if logged in
                 const classesResponse = await fetch("http://127.0.0.1:4000/getAvailableClasses");
                 const classesBody = await classesResponse.json();
-                console.log(classesBody);
 
                 this.setState({ classes: classesBody.h5_files }, async () => {
                     // Iterate over classes and fetch additional info
                     const classInfo = [];
                     for (const courseYear of this.state.classes) {
                         const section = { courseYear };
-                        // console.log(section);
+
                         const response = await fetch("http://localhost:3001/getClassInfo", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(section),
                         });
                         const body = await response.json();
-                        console.log(body)
+
                         if (body.instructor === localStorage.getItem("useremail")) {
                             classInfo.push(body);
                         } else {
@@ -85,14 +84,13 @@ class ScannableClasses extends React.Component {
     };
 
     handleClassClick = (clickedClass) => {
-        console.log("Clicked class:", clickedClass);
+
         const isClicked = true;
         this.setState({ selectedClass: clickedClass, isClicked });
     };
 
     createClasses() {
         const { classes, classInfo } = this.state;
-        console.log(classInfo)
         var classCounter = 0;
         var divElement = `<div class="classesBlock">`;
         var wrapper = `<div class= "classMainBlock">`;
@@ -111,7 +109,6 @@ class ScannableClasses extends React.Component {
                 wrapper += divElement;
                 wrapper += "</div>";
             } else if ((classCounter + 1) % 3 === 0) {
-                // console.log("huhu")
                 divElement += "</div>";
                 wrapper += divElement;
                 divElement = `<div class="classesBlock">`;
@@ -120,59 +117,17 @@ class ScannableClasses extends React.Component {
             classCounter++;
         }
 
-        console.log(wrapper);
         document.getElementById("classList").innerHTML = wrapper;
 
         const clickableElements = document.getElementsByClassName("clickable");
         for (let i = 0; i < clickableElements.length; i++) {
-            console.log(i)
+
             clickableElements[i].addEventListener("click", (event) => {
                 this.handleClassClick(clickableElements[i].id);
             });
         }
 
-        // const { classes } = this.state;
-        // var classCounter = 0;
-        // var divElement = `<div class="classesBlock">`;
-        // var wrapper = `<div class= "classMainBlock">`;
 
-        // while (classCounter !== classes.length) {
-        //     let currentClass = classes[classCounter];
-
-        //     const section = {
-        //         courseYear: classes[classCounter]
-        //     }
-
-
-
-        //     // divElement += `<div id="${currentClass} ${sem} ${year}" class="clickable">`;
-        //     // divElement += `<p>${currentClass}</p> `;
-        //     // divElement += `<p class="acadYearText">${sem} ${year}</p>`;
-        //     // divElement += `</div>`;
-
-        //     // if (classCounter + 1 === classes.length) {
-        //     //     divElement += "</div>";
-        //     //     wrapper += divElement;
-        //     //     wrapper += "</div>";
-        //     // } else if ((classCounter + 1) % 3 === 0) {
-        //     //     // console.log("huhu")
-        //     //     divElement += "</div>";
-        //     //     wrapper += divElement;
-        //     //     divElement = `<div class="classesBlock">`;
-        //     // }
-
-        //     // classCounter++;
-        // }
-
-        // console.log(wrapper);
-        // document.getElementById("classList").innerHTML = wrapper;
-
-        // const clickableElements = document.getElementsByClassName("clickable");
-        // for (let i = 0; i < clickableElements.length; i++) {
-        //     clickableElements[i].addEventListener("click", (event) => {
-        //         this.handleClassClick(event.target.id);
-        //     });
-        // }
     }
 
     render() {
@@ -184,7 +139,6 @@ class ScannableClasses extends React.Component {
 
         if (isClicked) {
             const url = `/Scan/${selectedClass}`;
-            console.log(url);
             return <Navigate to={url} replace />;
         }
         return (

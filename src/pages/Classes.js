@@ -5,6 +5,7 @@ import backIcon from './../assets/back.png'
 import logo from './../assets/appLogo.png';
 import { Navigate } from "react-router-dom";
 
+// Classes component
 class Classes extends React.Component {
     constructor(props) {
         super(props);
@@ -32,7 +33,6 @@ class Classes extends React.Component {
                 credentials: "include",
             });
             const loggedInBody = await loggedInResponse.json();
-            console.log(loggedInBody)
             // Update state based on login status
             if (loggedInBody.isLoggedIn) {
                 this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
@@ -48,7 +48,6 @@ class Classes extends React.Component {
             this.createClasses();
         } catch (error) {
             console.error(error);
-            // Handle errors appropriately, e.g., display an error message
         }
     };
 
@@ -62,11 +61,11 @@ class Classes extends React.Component {
     };
 
     handleClassClick = (clickedClass) => {
-        console.log("Clicked class:", clickedClass);
         const isClicked = true;
         this.setState({ selectedClass: clickedClass, isClicked });
     };
 
+    // creates the classes tiles
     createClasses() {
         const { classes, semester, acadYear } = this.state;
         var classCounter = 0;
@@ -87,7 +86,6 @@ class Classes extends React.Component {
                 wrapper += divElement;
                 wrapper += "</div>";
             } else if ((classCounter + 1) % 3 === 0) {
-                // console.log("huhu")
                 divElement += "</div>";
                 wrapper += divElement;
                 divElement = `<div class="classesBlock">`;
@@ -96,12 +94,10 @@ class Classes extends React.Component {
             classCounter++;
         }
 
-        console.log(wrapper);
         document.getElementById("classList").innerHTML = wrapper;
 
         const clickableElements = document.getElementsByClassName("clickable");
         for (let i = 0; i < clickableElements.length; i++) {
-            console.log(i)
             clickableElements[i].addEventListener("click", (event) => {
                 this.handleClassClick(clickableElements[i].id);
             });
@@ -113,7 +109,6 @@ class Classes extends React.Component {
 
         if (isClicked) {
             const url = `/Register/MyClasses/ClassRoster/${selectedClass}`;
-            console.log(url);
             return <Navigate to={url} replace />;
         }
 

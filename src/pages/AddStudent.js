@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import Webcam from 'react-webcam';
 import { Stepper } from 'react-form-stepper';
 
+// add student component
 class AddStudent extends React.Component {
     constructor(props) {
         super(props);
@@ -38,7 +39,6 @@ class AddStudent extends React.Component {
         // Set isActive to true after a short delay to trigger the fade-in effect
         this.timeout = setTimeout(() => {
             this.setState({ isActive: true });
-            console.log(document.cookie)
             fetch("http://localhost:3001/checkIfLoggedIn",
                 {
                     method: "POST",
@@ -46,7 +46,6 @@ class AddStudent extends React.Component {
                 })
                 .then(response => response.json())
                 .then(body => {
-                    console.log(body)
                     if (body.isLoggedIn) {
                         this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
                     } else {
@@ -90,13 +89,13 @@ class AddStudent extends React.Component {
     };
 
     handleOverlayData = (data) => {
-        console.log('Data from overlay:', data);
         this.setState({ faceSamples: data });
         this.hideOverlay();
         const fSampleText = document.getElementById("addFSampleText");
         fSampleText.innerText = "Completed";
     };
 
+    // validates the user input
     validateForm = () => {
         const { studentNumber, firstName, lastName, faceSamples } = this.state;
         var errors = "";
@@ -146,7 +145,6 @@ class AddStudent extends React.Component {
                     body: JSON.stringify(student)
                 }).then(response => response.json())
                 .then(body => {
-                    console.log(body);
                     toast.success('Student Added!', {
                         position: "bottom-right",
                         autoClose: 5000,
@@ -159,7 +157,7 @@ class AddStudent extends React.Component {
                     });
                     setTimeout(() => {
                         this.setState({ back: true });
-                    }, 400);
+                    }, 1000);
 
 
 
@@ -167,15 +165,10 @@ class AddStudent extends React.Component {
         }
     }
 
-
-
-
-
     render() {
         const { isLoggedIn, studentNumber, firstName, lastName, middleName, isOverlayVisible, back } = this.state;
         if (back) {
             const url = `/Register/MyClasses/ClassRoster/${this.props.classId}`;
-            console.log(url);
             return <Navigate to={url} replace />;
         }
 
@@ -328,7 +321,6 @@ class Overlay extends React.Component {
         const base64String = croppedCanvas.toDataURL('image/jpeg');
         inputData.push(base64String);
         this.setState({ inputData: inputData });
-        console.log(inputData.length);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         this.drawRectangle();
     };
@@ -337,7 +329,7 @@ class Overlay extends React.Component {
     startSampling = () => {
         const { samplingStage } = this.state;
 
-        var coundown = 16;
+        var coundown = 2000;
         const countdownText = document.getElementById("samplingCountdown");
         const startButton = document.getElementById("startButton");
         startButton.style.visibility = "hidden";
@@ -353,8 +345,8 @@ class Overlay extends React.Component {
                     // Execute captureImage every 0.5 seconds for 5 seconds
                     const intervalId = setInterval(() => {
                         this.captureImage();
-                        countdownText.innerText = Math.round((coundown - 1) / 8) + " seconds...";
-                        coundown--;
+                        countdownText.innerText = Math.round((coundown) / 1000) + " seconds...";
+                        coundown = coundown - 125;
                     }, 125);
 
 
@@ -371,14 +363,6 @@ class Overlay extends React.Component {
                         currentAngle.textContent = "Tilt to the left";
                         this.handleStepChange(1);
 
-
-                        // this.props.onDataSubmit(this.state.inputData);
-
-                        // // Clear input data after submitting
-                        // this.setState({ inputData: '' });
-
-                        // // Close the overlay
-                        // this.props.onClose();
                     }, 2000);
                 });
             }
@@ -388,8 +372,8 @@ class Overlay extends React.Component {
                     // Execute captureImage every 0.5 seconds for 5 seconds
                     const intervalId = setInterval(() => {
                         this.captureImage();
-                        countdownText.innerText = Math.round((coundown - 1) / 16) + " seconds...";
-                        coundown--;
+                        countdownText.innerText = Math.round((coundown - 1000) / 1000) + " seconds...";
+                        coundown = coundown - 1000;
                     }, 1000);
 
 
@@ -405,13 +389,6 @@ class Overlay extends React.Component {
                         currentAngle.textContent = "Tilt to the right";
                         this.handleStepChange(2);
 
-                        // this.props.onDataSubmit(this.state.inputData);
-
-                        // // Clear input data after submitting
-                        // this.setState({ inputData: '' });
-
-                        // // Close the overlay
-                        // this.props.onClose();
                     }, 2000);
                 });
             }
@@ -421,8 +398,8 @@ class Overlay extends React.Component {
                     // Execute captureImage every 0.5 seconds for 5 seconds
                     const intervalId = setInterval(() => {
                         this.captureImage();
-                        countdownText.innerText = Math.round((coundown - 1) / 16) + " seconds...";
-                        coundown--;
+                        countdownText.innerText = Math.round((coundown - 1000) / 1000) + " seconds...";
+                        coundown = coundown - 1000;
                     }, 1000);
 
 
@@ -438,13 +415,7 @@ class Overlay extends React.Component {
                         currentAngle.textContent = "Tilt upwards";
                         this.handleStepChange(3);
 
-                        // this.props.onDataSubmit(this.state.inputData);
 
-                        // // Clear input data after submitting
-                        // this.setState({ inputData: '' });
-
-                        // // Close the overlay
-                        // this.props.onClose();
                     }, 2000);
                 });
             }
@@ -454,8 +425,8 @@ class Overlay extends React.Component {
                     // Execute captureImage every 0.5 seconds for 5 seconds
                     const intervalId = setInterval(() => {
                         this.captureImage();
-                        countdownText.innerText = Math.round((coundown - 1) / 16) + " seconds...";
-                        coundown--;
+                        countdownText.innerText = Math.round((coundown - 1000) / 1000) + " seconds...";
+                        coundown = coundown - 1000;
                     }, 1000);
 
 
@@ -471,14 +442,6 @@ class Overlay extends React.Component {
                         currentAngle.textContent = "Tilt downwards"
                         this.handleStepChange(5);
 
-
-                        // this.props.onDataSubmit(this.state.inputData);
-
-                        // // Clear input data after submitting
-                        // this.setState({ inputData: '' });
-
-                        // // Close the overlay
-                        // this.props.onClose();
                     }, 2000);
                 });
             }
@@ -488,8 +451,8 @@ class Overlay extends React.Component {
                     // Execute captureImage every 0.5 seconds for 5 seconds
                     const intervalId = setInterval(() => {
                         this.captureImage();
-                        countdownText.innerText = Math.round((coundown - 1) / 16) + " seconds...";
-                        coundown--;
+                        countdownText.innerText = Math.round((coundown - 1000) / 1000) + " seconds...";
+                        coundown = coundown - 1000;
                     }, 1000);
 
 
@@ -500,8 +463,6 @@ class Overlay extends React.Component {
                         countdownText.innerText = "";
                         startButton.style.visibility = "visible";
                         backButton.style.visibility = "visible";
-                        // samplingPic.src = faceDown;
-                        console.log(this.state.inputData)
 
                         this.props.onDataSubmit(this.state.inputData);
 
@@ -514,80 +475,13 @@ class Overlay extends React.Component {
                 });
             }
         }
-
-
-        // var coundown = 20;
-        // const countdownText = document.getElementById("samplingCountdown");
-        // const startButton = document.getElementById("startButton");
-        // startButton.style.display = "none";
-        // const backButton = document.getElementById("overlayFCBack");
-        // backButton.style.display = "none";
-        // if (!this.state.samplingInProgress) {
-        //     this.setState({ samplingInProgress: true }, () => {
-        //         // Execute captureImage every 0.5 seconds for 5 seconds
-        //         const intervalId = setInterval(() => {
-        //             this.captureImage();
-        //             countdownText.innerText = Math.round((coundown - 1) / 4) + " seconds...";
-        //             coundown--;
-        //         }, 250);
-
-
-        //         // Stop sampling process after 5 seconds
-        //         setTimeout(() => {
-        //             clearInterval(intervalId);
-        //             this.setState({ samplingInProgress: false });
-        //             this.props.onDataSubmit(this.state.inputData);
-
-        //             // Clear input data after submitting
-        //             this.setState({ inputData: '' });
-
-        //             // Close the overlay
-        //             this.props.onClose();
-        //         }, 5000);
-        //     });
-        // }
-
     };
 
-    // // Start sampling process
-    // startSampling = () => {
-    //     var coundown = 20;
-    //     const countdownText = document.getElementById("samplingCountdown");
-    //     const startButton = document.getElementById("startButton");
-    //     startButton.style.display = "none";
-    //     const backButton = document.getElementById("overlayFCBack");
-    //     backButton.style.display = "none";
-    //     if (!this.state.samplingInProgress) {
-    //         this.setState({ samplingInProgress: true }, () => {
-    //             // Execute captureImage every 0.5 seconds for 5 seconds
-    //             const intervalId = setInterval(() => {
-    //                 this.captureImage();
-    //                 countdownText.innerText = Math.round((coundown - 1) / 4) + " seconds...";
-    //                 coundown--;
-    //             }, 250);
 
-
-    //             // Stop sampling process after 5 seconds
-    //             setTimeout(() => {
-    //                 clearInterval(intervalId);
-    //                 this.setState({ samplingInProgress: false });
-    //                 this.props.onDataSubmit(this.state.inputData);
-
-    //                 // Clear input data after submitting
-    //                 this.setState({ inputData: '' });
-
-    //                 // Close the overlay
-    //                 this.props.onClose();
-    //             }, 5000);
-    //         });
-    //     }
-
-    // };
 
     drawRectangle() {
         const element = document.getElementById('videoStream');
         const rect = element.getBoundingClientRect();
-        console.log('Element position (relative to viewport):', rect.top, rect.left);
         const canvRefLoc = document.getElementById('canvasPhoto');
         // canvRefLoc.style.backgroundColor = "green";
         canvRefLoc.style.position = 'absolute';
@@ -606,7 +500,6 @@ class Overlay extends React.Component {
 
         const canvas2 = this.canvasRef.current;
         const ctx2 = canvas2.getContext('2d');
-        console.log(this.faceOutlineImg.width)
         this.faceOutlineImg.onload = () => {
             ctx2.drawImage(this.faceOutlineImg, 198, 80, 300 * (this.faceOutlineImg.width / this.faceOutlineImg.height), 300); // Adjust x, y, width, height as needed
         };
@@ -632,10 +525,6 @@ class Overlay extends React.Component {
                             <img onClick={this.handleBackClick} id="overlayFCBack" className="BackIconOverlay" src={backIcon} alt="back" />
                             <p id="addFCText">Add Face Samples</p>
                         </div>
-
-                        {/* <button onClick={this.handleSubmit}>Submit Data</button>
-                    <button onClick={this.props.onClose}>Close Overlay</button> */}
-                        {/* Dropdown to select video source */}
                         <select id="dropdownCam" onChange={this.handleVideoSourceChange}>
                             <option value="">Select Video Source</option>
                             {this.state.videoSources.map((source) => (

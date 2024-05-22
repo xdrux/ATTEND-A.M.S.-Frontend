@@ -11,7 +11,7 @@ import JSZip from 'jszip';
 import { toast } from 'react-toastify';
 import ReactLoading from 'react-loading';
 
-
+// class roster component
 class ClassRoster extends React.Component {
     constructor(props) {
         super(props);
@@ -30,7 +30,7 @@ class ClassRoster extends React.Component {
             isEditClicked: false,
             isViewClicked: false,
             studentClicked: null,
-            isClassClicked: false
+            isClassClicked: false,
         };
     }
 
@@ -47,7 +47,6 @@ class ClassRoster extends React.Component {
                 credentials: "include",
             });
             const loggedInBody = await loggedInResponse.json();
-            console.log(loggedInBody)
 
             // Update state based on login status
             if (loggedInBody.isLoggedIn) {
@@ -102,8 +101,6 @@ class ClassRoster extends React.Component {
     };
 
     handleEditClick = (student, e) => {
-        console.log(student);
-        console.log("HOOIOY")
         // Prevent event propagation
         e.stopPropagation();
         this.setState({ isEditClicked: true, studentClicked: student });
@@ -111,8 +108,6 @@ class ClassRoster extends React.Component {
 
 
     handleViewClick = (student) => {
-        console.log(student);
-
         this.setState({ isViewClicked: true, studentClicked: student });
 
     }
@@ -122,7 +117,6 @@ class ClassRoster extends React.Component {
     }
 
     handleTrashDeleteClick = (student, e) => {
-        console.log(student);
         e.stopPropagation();
 
         const body = {
@@ -140,7 +134,6 @@ class ClassRoster extends React.Component {
                 body: JSON.stringify(body)
             }).then(response => response.json())
             .then(body => {
-                console.log(body);
                 this.setState(prevState => ({
                     students: prevState.students.filter(s => s !== student)
                 }));
@@ -163,6 +156,8 @@ class ClassRoster extends React.Component {
     };
 
     handleDownloadDataClick = () => {
+
+        this.setState({ loading: true });
         const section = {
             courseYear: this.props.classId
         }
@@ -177,7 +172,6 @@ class ClassRoster extends React.Component {
                 body: JSON.stringify(section)
             }).then(response => response.json())
             .then(body => {
-                console.log(body);
                 const zip = new JSZip();
 
                 body[0].forEach((folderName, index) => {
@@ -196,6 +190,7 @@ class ClassRoster extends React.Component {
                     link.setAttribute('download', `${this.props.classId}.zip`);
                     document.body.appendChild(link);
                     link.click();
+                    this.setState({ loading: false });
                 });
             });
     };
@@ -205,7 +200,6 @@ class ClassRoster extends React.Component {
     };
 
     handleOverlayData = (data) => {
-        console.log('Data from overlay:', data);
 
         if (data === "whole") {
             const section = {
@@ -274,22 +268,17 @@ class ClassRoster extends React.Component {
         }
 
         if (isViewClicked) {
-            console.log("hehe")
             const url = `/Register/MyClasses/ClassRoster/${this.props.classId}/${studentClicked}/view`;
-            console.log(url);
             return <Navigate to={url} replace />;
         }
 
         if (isEditClicked) {
-            console.log("HOOOY")
             const url = `/Register/MyClasses/ClassRoster/${this.props.classId}/${studentClicked}/edit`;
-            console.log(url);
             return <Navigate to={url} replace />;
         }
 
         if (isAddStudentClicked) {
             const url = `/Register/MyClasses/ClassRoster/${this.props.classId}/AddStudent`;
-            console.log(url);
             return <Navigate to={url} replace />;
         }
 
@@ -423,7 +412,6 @@ class ClassInfoOverlay extends React.Component {
 
 
     render() {
-        console.log(this.props.data)
         const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         const sched = this.props.data.courseSchedule.map(function (num) {
             return weekdays[num];
@@ -458,12 +446,7 @@ class ClassInfoOverlay extends React.Component {
                             <p>{this.props.data.courseStartTime} - {this.props.data.courseEndTime}</p>
                             <p>{this.props.data.gracePeriod} minutes</p>
                         </div>
-                        {/* <p>Type: {this.props.data.classType}</p>
-                        <p>Instructor: {this.props.data.instructor}</p>
-                        <p>Class Start/End Date: {new Date(this.props.data.courseStartDate).toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "2-digit" }).replace(/\//g, '/')} - {new Date(this.props.data.courseEndDate).toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "2-digit" }).replace(/\//g, '/')}</p>
-                        <p>Class Schedule: {sched.join(", ")}</p>
-                        <p>Class Period: {this.props.data.courseStartTime} - {this.props.data.courseEndTime}</p>
-                        <p>Grace Period: {this.props.data.gracePeriod} minutes</p> */}
+
                     </div>
                 </div>
             </div>

@@ -5,6 +5,7 @@ import logo from './../assets/landingLogo.png';
 import Cookies from "universal-cookie";
 import { Navigate } from "react-router-dom";
 
+// login component
 class LogIn extends React.Component {
     constructor(props) {
         super(props);
@@ -28,7 +29,6 @@ class LogIn extends React.Component {
             })
             .then(response => response.json())
             .then(body => {
-                console.log(body)
                 if (body.isLoggedIn) {
                     this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
                 } else {
@@ -53,7 +53,6 @@ class LogIn extends React.Component {
         if (document.getElementById('l-myForm').checkValidity() === true) { //performs the validity of the form (checks if every field has input and if they are in correct format)
             e.preventDefault();
             const { email, password } = this.state;
-            console.log(email, password)
 
             const credentials = {
                 email: email,
@@ -72,7 +71,6 @@ class LogIn extends React.Component {
                 })
                 .then(response => response.json())
                 .then(body => {
-                    console.log(body)
                     if (!body.success) {
                         document.getElementById("incorrectEmailPass").style.visibility = "visible";
                     }
@@ -91,7 +89,6 @@ class LogIn extends React.Component {
                             });
 
                         localStorage.setItem("useremail", body.useremail);
-                        // alert("Successfully logged in");
                         this.setState({ isLoggedIn: true });
 
 

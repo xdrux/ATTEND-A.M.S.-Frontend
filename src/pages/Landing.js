@@ -7,6 +7,7 @@ import exit from './../assets/exit.png';
 import Cookies from "universal-cookie";
 import { Navigate } from "react-router-dom";
 
+//Home page component
 class Landing extends React.Component {
     constructor(props) {
         super(props);
@@ -24,7 +25,6 @@ class Landing extends React.Component {
         // Set isActive to true after a short delay to trigger the fade-in effect
         this.timeout = setTimeout(() => {
             this.setState({ isActive: true });
-            console.log(document.cookie)
             fetch("http://localhost:3001/checkIfLoggedIn",
                 {
                     method: "POST",
@@ -32,7 +32,6 @@ class Landing extends React.Component {
                 })
                 .then(response => response.json())
                 .then(body => {
-                    console.log(body)
                     if (body.isLoggedIn) {
                         this.setState({ isLoggedIn: true, username: localStorage.getItem("useremail") });
                     } else {

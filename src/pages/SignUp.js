@@ -5,6 +5,7 @@ import logo from './../assets/landingLogo.png';
 import { toast } from 'react-toastify';
 import { Navigate } from "react-router-dom";
 
+// signup component
 class SignUp extends React.Component {
     constructor(props) {
         super(props);
@@ -45,7 +46,6 @@ class SignUp extends React.Component {
         if (document.getElementById('l-myForm').checkValidity() === true) { //performs the validity of the form (checks if every field has input and if they are in correct format)
             e.preventDefault();
             const { email, password, repeatPass } = this.state;
-            console.log(email, password, repeatPass);
             if (password !== repeatPass) {
                 document.getElementById("passNotMatch").style.visibility = "visible";
             } else {
@@ -68,7 +68,6 @@ class SignUp extends React.Component {
                     })
                     .then(response => response.json())
                     .then(body => {
-                        console.log(body);
                         toast.success('User Saved!', {
                             position: "bottom-right",
                             autoClose: 5000,
